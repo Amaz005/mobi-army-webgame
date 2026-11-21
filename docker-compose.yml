@@ -66,7 +66,36 @@ services:
       - ./docker/web/nginx.${WEB_MODE:-local}.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./docker/web/certs:/etc/nginx/certs:ro
       - ./docker/web/acme:/var/www/acme:ro
+    networks:
+      default: {}
+      tunnel:
+        # Pinned so Docker never hands web the address reserved for cloudflared (.2).
+        ipv4_address: 172.29.252.3
     restart: unless-stopped
+
+  # Cloudflare Tunnel (optional): enable with COMPOSE_PROFILES=tunnel and CLOUDFLARE_TUNNEL_TOKEN in .env.
+  # Route the tunnel's public hostname to http://web:8080 (README › Cloudflare Tunnel).
+  cloudflared:
+    image: cloudflare/cloudflared:2025.4.0
+    profiles: ["tunnel"]
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - web
+    networks:
+      tunnel:
+        # nginx trusts CF-Connecting-IP only from this address (docker/web/nginx.local.conf.template).
+        ipv4_address: 172.29.252.2
+    restart: unless-stopped
+
+networks:
+  default: {}
+  # Only web and cloudflared. Its fixed address is what lets nginx tell tunnel traffic from direct traffic.
+  tunnel:
+    ipam:
+      config:
+        - subnet: 172.29.252.0/29
 
 volumes:
   pgdata: {}

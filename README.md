@@ -69,5 +69,31 @@ Each visitor IP may hold `WEB_MAX_CONN_PER_IP` (default 4) game connections and 
 `WEB_CONN_RATE` (default 10 per minute) new ones; beyond that they get HTTP 503/429. If the domain or
 certificates are missing, only the web service refuses to start; the game server keeps running.
 
+### Cloudflare Tunnel (instead of public mode)
+
+Cloudflare serves HTTPS and forwards browser traffic through an outbound tunnel, so you don't
+need certificates or open web ports. It doesn't carry the raw TCP port 19149: phone clients need
+19149 opened directly, pointing at the host's real IP (DNS record not proxied).
+
+1. Install `cloudflared` (Windows: `winget install Cloudflare.cloudflared`), with your domain on Cloudflare.
+2. Create the tunnel and its hostname:
+   ```
+   cloudflared tunnel login
+   cloudflared tunnel create mobiarmy
+   cloudflared tunnel route dns mobiarmy game.example.com
+   cloudflared tunnel token mobiarmy        # copy the output
+   ```
+3. In the Cloudflare dashboard (Zero Trust › Networks › Tunnels › mobiarmy › Public hostname), send
+   `game.example.com` to service `http://web:8080`.
+4. In `.env`: keep `WEB_MODE=local`, then set `COMPOSE_PROFILES=tunnel`,
+   `CLOUDFLARE_TUNNEL_TOKEN=<token>` and, to make the site reachable only through Cloudflare,
+   `WEB_PORT=127.0.0.1:8080`.
+5. `docker compose up -d --build`, then open `https://game.example.com`.
+
+Per-visitor limits still work: nginx takes the visitor IP from Cloudflare's `CF-Connecting-IP`
+header, but only for requests coming from the `cloudflared` container (fixed address 172.29.252.2 on
+the compose network `tunnel`, subnet 172.29.252.0/29; change both in `docker-compose.yml` and
+`docker/web/nginx.local.conf.template` if that subnet is taken on your host).
+
 How the browser client works (original bytecode compiled to JavaScript with TeaVM, plus a thin MIDP
 layer and a WebSocket relay): [specs/002-web-client/plan.md](specs/002-web-client/plan.md).

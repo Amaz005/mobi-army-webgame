@@ -12,7 +12,7 @@ fixed; the server must speak its protocol exactly. Governing rules live in
 | `Client/SOURCE_ARMYI/` | Decompiled client source — handy for reading the protocol, but **lossy** (JD-Core dropped code, e.g. `model/y.java`); confirm against bytecode. |
 | `Army165local/` | **Original** J2ME client bytecode + resources (`coreLG.TerrainMidlet`) — never edit; the web client compiles it. |
 | `web-client/` | Browser build of the original client: TeaVM + thin MIDP web layer (`javax/microedition/*`, `web/*`). |
-| `docker/relay/`, `docker/web/` | WebSocket→TCP relay (fixed target `server:19149`) and nginx configs (local/public). |
+| `docker/relay/`, `docker/web/` | WebSocket→TCP relay (fixed target `server:19149`) and nginx configs (local/public). Optional `cloudflared` compose service (profile `tunnel`); nginx trusts `CF-Connecting-IP` only from its fixed IP 172.29.252.2. |
 | `Army165sv.jar` | Prebuilt legacy server jar — reference only. |
 | `mobiarmy-java/dbarmy.sql` | **Canonical** PostgreSQL schema + seed data (also loads into SQLite). |
 | `mobiarmy.sql` | Old MySQL dump (different schema) — reference only. |
