@@ -1,15 +1,19 @@
--- Creates a least-privilege MySQL account for the game server (constitution Principle IV).
--- Run once as an admin user:   mysql -u root -p < mobiarmy-java/sql/create_game_user.sql
+-- Creates a least-privilege PostgreSQL role for the game server (constitution Principle IV).
+-- Run once as a superuser, AFTER loading dbarmy.sql:
+--   psql -U postgres -d dbarmy -f mobiarmy-java/sql/create_game_user.sql
 --
--- Before running, replace:
---   CHANGE_ME_STRONG_PASSWORD  -> a long random password (then set it as MYSQL_PASSWORD for the server)
---   'localhost'                -> the game server's IP if MySQL runs on a different machine
---                                 (e.g. 'army'@'203.0.113.10'); never use '%'.
--- Then in army2.conf set:  mysql-user: army   (leave mysql-password empty)
+-- Before running, replace CHANGE_ME_STRONG_PASSWORD with a long random password,
+-- then give it to the server as the DB_PASSWORD environment variable.
+-- army2.conf should have:  db-user: army   (leave db-password empty)
+--
+-- Restrict WHERE the role can connect from in pg_hba.conf, e.g. only the game server's IP:
+--   host  dbarmy  army  203.0.113.10/32  scram-sha-256
+-- and keep listen_addresses / the firewall closed to everything else.
 
-CREATE USER IF NOT EXISTS 'army'@'localhost' IDENTIFIED BY 'CHANGE_ME_STRONG_PASSWORD';
+CREATE ROLE army LOGIN PASSWORD 'CHANGE_ME_STRONG_PASSWORD';
 
--- Row-level access only: no DROP/ALTER/CREATE, no GRANT, no access to other databases.
-GRANT SELECT, INSERT, UPDATE, DELETE ON `dbarmy`.* TO 'army'@'localhost';
-
-FLUSH PRIVILEGES;
+-- Row-level access only: no DDL, no superuser, no access to other databases.
+GRANT CONNECT ON DATABASE dbarmy TO army;
+GRANT USAGE ON SCHEMA public TO army;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO army;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO army;

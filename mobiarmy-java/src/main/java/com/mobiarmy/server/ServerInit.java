@@ -32,20 +32,20 @@ public class ServerInit {
     public static void init() {
         ServerManager.start = false;
         ServerManager.loadConfigFile();
-        SqlConnectionManager.configure(ServerManager.mysqlHost, ServerManager.mysqlDatabase, ServerManager.mysqlUser, ServerManager.mysqlPass);
-        
-        SqlConnectionManager.useMySql();
+        SqlConnectionManager.configure(ServerManager.dbHost, ServerManager.dbDatabase, ServerManager.dbUser, ServerManager.dbPass);
+
+        SqlConnectionManager.usePostgres();
         try (Connection conn = SqlConnectionManager.createConnection()) {
-            System.out.println("[ServerInit] Connected to MySQL " + ServerManager.mysqlHost + "/" + ServerManager.mysqlDatabase);
+            System.out.println("[ServerInit] Connected to PostgreSQL " + ServerManager.dbHost + "/" + ServerManager.dbDatabase);
         } catch (Exception e) {
-            throw new IllegalStateException("Cannot connect to MySQL " + ServerManager.mysqlHost + "/" + ServerManager.mysqlDatabase, e);
+            throw new IllegalStateException("Cannot connect to PostgreSQL " + ServerManager.dbHost + "/" + ServerManager.dbDatabase, e);
         }
 
         System.out.println("Load map data");
         try {
             MapData.entries = new ArrayList<>();
             MapData.brickEntries = new ArrayList<>();
-            forEachRow("SELECT * FROM `map` ORDER BY `id`;", r -> {
+            forEachRow("SELECT * FROM map ORDER BY id;", r -> {
                 String file = r.getString("file");
                 MapData.MapDataEntry e = new MapData.MapDataEntry();
                 e.id = (byte) (r.getInt("id") - 1);
@@ -82,7 +82,7 @@ public class ServerInit {
             NVData.entries = new ArrayList<>();
             NVData.equips = new ArrayList<>();
             NVData.saleEquipCount = 0;
-            forEachRow("SELECT * FROM `nhanvat` ORDER BY `nhanvat_id`;", r -> {
+            forEachRow("SELECT * FROM nhanvat ORDER BY nhanvat_id;", r -> {
                 NVData.NvEntry entry = new NVData.NvEntry();
                 entry.id = (byte) (r.getInt("nhanvat_id") - 1);
                 entry.name = r.getString("name");
@@ -117,7 +117,7 @@ public class ServerInit {
         System.out.println("Load Item Data!");
         try {
             ItemData.entries = new ArrayList<>();
-            forEachRow("SELECT * FROM `item` ORDER BY `item_id`;", r -> {
+            forEachRow("SELECT * FROM item ORDER BY item_id;", r -> {
                 ItemData.ItemEntry e = new ItemData.ItemEntry();
                 e.name = r.getString("name");
                 e.buyXu = r.getShort("xu");

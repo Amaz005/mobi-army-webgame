@@ -1,76 +1,45 @@
--- phpMyAdmin SQL Dump
--- version 5.2.3
--- https://www.phpmyadmin.net/
---
--- Máy chủ: localhost
--- Thời gian đã tạo: Th7 13, 2026 lúc 03:41 PM
--- Phiên bản máy phục vụ: 5.7.34
--- Phiên bản PHP: 8.3.21
+-- MobiArmy schema + seed data (PostgreSQL).
+-- Load once into an empty database:   psql -U postgres -d dbarmy -f mobiarmy-java/dbarmy.sql
+-- Uses portable SQL so SqlConnectionManager.useLocalDump can also load it into SQLite for dev.
+-- Identifiers are unquoted, so PostgreSQL stores them lowercase (e.g. mapAddY -> mapaddy);
+-- JDBC column lookups by name are case-insensitive, so the Java code is unaffected.
+-- Flag columns use SMALLINT 0/1 because the code reads them with getInt().
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+SET client_encoding = 'UTF8';
 
+BEGIN;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+CREATE TABLE account (
+  id INTEGER PRIMARY KEY,
+  username VARCHAR(20) NOT NULL,
+  password VARCHAR(50) NOT NULL,
+  xu INTEGER NOT NULL DEFAULT 1000,
+  nvBuy VARCHAR(50) NOT NULL DEFAULT '[1, 1, 1, 0, 0, 0, 0, 0, 0]',
+  online SMALLINT NOT NULL DEFAULT 0,
+  itembag VARCHAR(500) NOT NULL DEFAULT '[[0,99],[1,99],[2,99],[3,99],[4,99],[5,99],[6,99],[7,99],[8,99],[9,99],[10,99],[11,99],[12,99],[13,99],[14,99],[15,99],[16,99],[17,99],[18,99],[19,99],[20,99],[21,99]]',
+  superadmin SMALLINT NOT NULL DEFAULT 0,
+  banbe VARCHAR(500) NOT NULL DEFAULT '[3]',
+  nhanvat INTEGER NOT NULL DEFAULT 0,
+  exp INTEGER NOT NULL DEFAULT 0,
+  killdead VARCHAR(500) DEFAULT '[0, 0]',
+  thongtin VARCHAR(500) DEFAULT '[]'
+);
 
---
--- Cơ sở dữ liệu: `mobiarmy`
---
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `account`
---
-
-CREATE TABLE `account` (
-  `id` int(11) NOT NULL,
-  `username` varchar(20) NOT NULL,
-  `password` varchar(50) NOT NULL,
-  `xu` int(10) NOT NULL DEFAULT 1000,
-  `nvBuy` varchar(50) NOT NULL DEFAULT '[1, 1, 1, 0, 0, 0, 0, 0, 0]',
-  `online` tinyint(4) NOT NULL DEFAULT 0,
-  `itembag` varchar(500) NOT NULL DEFAULT '[[0,99],[1,99],[2,99],[3,99],[4,99],[5,99],[6,99],[7,99],[8,99],[9,99],[10,99],[11,99],[12,99],[13,99],[14,99],[15,99],[16,99],[17,99],[18,99],[19,99],[20,99],[21,99]]',
-  `superadmin` tinyint(4) NOT NULL DEFAULT 0,
-  `banbe` varchar(500) NOT NULL DEFAULT '[3]',
-  `nhanvat` int(11) NOT NULL DEFAULT 0,
-  `exp` int(11) NOT NULL DEFAULT 0,
-  `killdead` varchar(500) DEFAULT '[0, 0]',
-  `thongtin` varchar(500) DEFAULT '[]'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Đang đổ dữ liệu cho bảng `account`
---
-
-INSERT INTO `account` 
-(`id`, `username`, `password`, `xu`, `nvBuy`, `online`, `itembag`, `superadmin`, `banbe`, `nhanvat`, `exp`, `killdead`, `thongtin`) VALUES
+INSERT INTO account
+(id, username, password, xu, nvBuy, online, itembag, superadmin, banbe, nhanvat, exp, killdead, thongtin) VALUES
 (1, 'a', '1', 1000000, '[1, 1, 1, 0, 0, 0, 0, 0, 0]', 0, '[[0,99],[1,99],[2,99],[3,99],[4,99],[5,99],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0]]', 0, '[3]', 9, 0, '[0, 0]', '[]'),
 (2, 'a', '1', 1000000, '[1, 1, 1, 0, 0, 0, 0, 0, 0]', 0, '[[0,99],[1,99],[2,99],[3,99],[4,99],[5,99],[6,99],[7,99],[8,99],[9,99],[10,99],[11,99],[12,99],[13,99],[14,99],[15,99],[16,99],[17,99],[18,99],[19,99],[20,99],[21,99]]', 1, '[3]', 1, 50000, '[0, 0]', '[]'),
 (3, 'nguoiduatin', '3', 1000, '[1, 1, 1, 0, 0, 0, 0, 0, 0]', 0, '[[0,99],[1,99],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0]]', 1, '[3]', 1, 500000, '[0, 0]', '[]');
--- --------------------------------------------------------
 
---
--- Cấu trúc bảng cho bảng `item`
---
+CREATE TABLE item (
+  item_id SMALLINT PRIMARY KEY,
+  name VARCHAR(15) NOT NULL,
+  xu SMALLINT NOT NULL,
+  luong SMALLINT NOT NULL,
+  nDcMang SMALLINT NOT NULL
+);
 
-CREATE TABLE `item` (
-  `item_id` tinyint(3) NOT NULL,
-  `name` varchar(15) COLLATE utf8_bin NOT NULL,
-  `xu` smallint(4) NOT NULL,
-  `luong` smallint(3) NOT NULL,
-  `nDcMang` smallint(3) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
---
--- Đang đổ dữ liệu cho bảng `item`
---
-
-INSERT INTO `item` (`item_id`, `name`, `xu`, `luong`, `nDcMang`) VALUES
+INSERT INTO item (item_id, name, xu, luong, nDcMang) VALUES
 (1, 'HP', 0, -1, 2),
 (2, 'Teleport', 0, -1, 2),
 (3, 'Bắn x2', 200, -1, 1),
@@ -94,32 +63,20 @@ INSERT INTO `item` (`item_id`, `name`, `xu`, `luong`, `nDcMang`) VALUES
 (21, 'Mưa đạn', 500, -1, 1),
 (22, 'Khoang đất', 150, -1, 1);
 
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `map`
---
-
--- Thay thế TOÀN BỘ đoạn `map` table cũ trong dbarmy.sql/armydb.sql bằng đoạn này.
--- Đã thêm cột `is_boss` (0 = map thường, 1 = map boss) — không phụ thuộc khoảng id nữa,
--- bạn thêm map thường mới id nào cũng được sau này mà không lo đụng độ với map boss.
--- Cú pháp CREATE TABLE/INSERT dưới đây chạy được cả trên SQLite lẫn MySQL thật.
-
-DROP TABLE IF EXISTS `map`;
-
-CREATE TABLE `map` (
-  `id` INTEGER PRIMARY KEY,
-  `name` VARCHAR(100) NOT NULL,
-  `file` VARCHAR(100) NOT NULL,
-  `bg` SMALLINT NOT NULL DEFAULT 0,
-  `mapAddY` SMALLINT NOT NULL DEFAULT 0,
-  `bullEffShower` SMALLINT NOT NULL DEFAULT 0,
-  `inWaterAddY` SMALLINT NOT NULL DEFAULT 0,
-  `cl2AddY` SMALLINT NOT NULL DEFAULT 0,
-  `is_boss` TINYINT(1) NOT NULL DEFAULT 0
+-- is_boss: 0 = normal map, 1 = boss map (independent of id ranges).
+CREATE TABLE map (
+  id INTEGER PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  file VARCHAR(100) NOT NULL,
+  bg SMALLINT NOT NULL DEFAULT 0,
+  mapAddY SMALLINT NOT NULL DEFAULT 0,
+  bullEffShower SMALLINT NOT NULL DEFAULT 0,
+  inWaterAddY SMALLINT NOT NULL DEFAULT 0,
+  cl2AddY SMALLINT NOT NULL DEFAULT 0,
+  is_boss SMALLINT NOT NULL DEFAULT 0
 );
 
-INSERT INTO `map` (`id`, `name`, `file`, `bg`, `mapAddY`, `bullEffShower`, `inWaterAddY`, `cl2AddY`, `is_boss`) VALUES
+INSERT INTO map (id, name, file, bg, mapAddY, bullEffShower, inWaterAddY, cl2AddY, is_boss) VALUES
 (1, 'Cây cầu băng', 'bangtuyet_caycaubang.map', 7, -10, -50, -1, 0, 0),
 (2, 'Sống sót', 'bangtuyet_songsot.map', 7, -10, -50, -1, 0, 0),
 (3, 'Khu năng lượng', 'bencang_khunangluong.map', 7, 0, 0, -1, 0, 0),
@@ -182,29 +139,19 @@ INSERT INTO `map` (`id`, `name`, `file`, `bg`, `mapAddY`, `bullEffShower`, `inWa
 (89, 'Đỉnh hi mã lạp sơn', 'boss_ballon.map', 2, -1, -50, -1, -1, 1),
 (90, 'Hang nhện', 'boss_hangnhen.map', 13, -1, 80, -1, -1, 1);
 
--- --------------------------------------------------------
+CREATE TABLE nhanvat (
+  nhanvat_id SMALLINT PRIMARY KEY,
+  name VARCHAR(15) NOT NULL,
+  xu INTEGER NOT NULL,
+  luong SMALLINT NOT NULL,
+  ma_sat_gio SMALLINT NOT NULL,
+  goc_min SMALLINT NOT NULL,
+  sat_thuong SMALLINT NOT NULL,
+  sat_thuong_dan SMALLINT NOT NULL,
+  so_dan SMALLINT NOT NULL
+);
 
---
--- Cấu trúc bảng cho bảng `nhanvat`
---
-
-CREATE TABLE `nhanvat` (
-  `nhanvat_id` tinyint(3) NOT NULL,
-  `name` varchar(15) COLLATE utf8_bin NOT NULL,
-  `xu` int(10) NOT NULL,
-  `luong` smallint(3) NOT NULL,
-  `ma_sat_gio` smallint(4) NOT NULL,
-  `goc_min` smallint(4) NOT NULL,
-  `sat_thuong` smallint(4) NOT NULL,
-  `sat_thuong_dan` smallint(4) NOT NULL,
-  `so_dan` smallint(4) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
---
--- Đang đổ dữ liệu cho bảng `nhanvat`
---
-
-INSERT INTO `nhanvat` (`nhanvat_id`, `name`, `xu`, `luong`, `ma_sat_gio`, `goc_min`, `sat_thuong`, `sat_thuong_dan`, `so_dan`) VALUES
+INSERT INTO nhanvat (nhanvat_id, name, xu, luong, ma_sat_gio, goc_min, sat_thuong, sat_thuong_dan, so_dan) VALUES
 (1, 'Gunner', 0, 0, 80, -45, 280, 28, 1),
 (2, 'Miss 6', 0, 0, 50, -45, 290, 14, 2),
 (3, 'Electician', 0, 0, 80, -45, 300, 10, 3),
@@ -215,51 +162,4 @@ INSERT INTO `nhanvat` (`nhanvat_id`, `name`, `xu`, `luong`, `ma_sat_gio`, `goc_m
 (8, 'Tarzan', 50000, 40, 10, 1, 350, 30, 1),
 (9, 'Apache', 70000, 64, 30, -45, 450, 11, 4);
 
---
--- Chỉ mục cho các bảng đã đổ
---
-
---
--- Chỉ mục cho bảng `item`
---
-ALTER TABLE `item`
-  ADD PRIMARY KEY (`item_id`);
-
---
--- Chỉ mục cho bảng `map`
---
-ALTER TABLE `map`
-  ADD PRIMARY KEY (`id`);
-
---
--- Chỉ mục cho bảng `nhanvat`
---
-ALTER TABLE `nhanvat`
-  ADD PRIMARY KEY (`nhanvat_id`);
-
---
--- AUTO_INCREMENT cho các bảng đã đổ
---
-
---
--- AUTO_INCREMENT cho bảng `item`
---
-ALTER TABLE `item`
-  MODIFY `item_id` tinyint(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
-
---
--- AUTO_INCREMENT cho bảng `map`
---
-ALTER TABLE `map`
-  MODIFY `id` tinyint(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
-
---
--- AUTO_INCREMENT cho bảng `nhanvat`
---
-ALTER TABLE `nhanvat`
-  MODIFY `nhanvat_id` tinyint(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

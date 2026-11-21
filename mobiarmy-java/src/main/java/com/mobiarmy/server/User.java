@@ -210,7 +210,7 @@ public class User {
         } catch (Exception ignored) {}
 
         try (Connection conn = SqlConnectionManager.createConnection();
-             PreparedStatement stmt = conn.prepareStatement("UPDATE `account` SET `exp`=? WHERE `id`=?")) {
+             PreparedStatement stmt = conn.prepareStatement("UPDATE account SET exp=? WHERE id=?")) {
             stmt.setInt(1, exp);
             stmt.setInt(2, iddb);
             stmt.executeUpdate();
@@ -323,7 +323,7 @@ public class User {
         try {
             User us = null;
             try (Connection conn = SqlConnectionManager.createConnection();
-                 PreparedStatement stmt = conn.prepareStatement("SELECT * FROM `account` WHERE `username`=? AND `password`=? LIMIT 1")) {
+                 PreparedStatement stmt = conn.prepareStatement("SELECT * FROM account WHERE username=? AND password=? LIMIT 1")) {
                 stmt.setString(1, userName);
                 stmt.setString(2, pass);
                 try (java.sql.ResultSet row = stmt.executeQuery()) {
@@ -406,7 +406,7 @@ public class User {
                         
                         // Kick duplicate not implemented yet
                         // Update online status
-                        try (PreparedStatement updateStmt = conn.prepareStatement("UPDATE `account` SET `online`=1 WHERE `id`=?")) {
+                        try (PreparedStatement updateStmt = conn.prepareStatement("UPDATE account SET online=1 WHERE id=?")) {
                             updateStmt.setInt(1, us.iddb);
                             updateStmt.executeUpdate();
                         }

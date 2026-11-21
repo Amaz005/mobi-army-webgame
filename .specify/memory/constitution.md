@@ -93,7 +93,7 @@ unclear which behavior is correct.
 
 - Language/runtime: Java 17; build with Maven (`mobiarmy-java/pom.xml`). Dependencies MUST be
   declared in the POM with pinned versions; no committed loose JARs for libraries.
-- Persistence: MySQL is the production database; SQLite is permitted only for local
+- Persistence: PostgreSQL is the production database; SQLite is permitted only for local
   development and tests. Code MUST access storage through a single data-access layer so both
   backends behave identically.
 - Networking: raw TCP socket server compatible with the MobiArmy client protocol. Each client
@@ -133,4 +133,4 @@ unclear which behavior is correct.
 - Compliance is reviewed at plan time (Constitution Check), at task generation, and during code
   review. Reviewers MUST reject changes that violate a NON-NEGOTIABLE principle.
 
-**Version**: 1.0.1 | **Ratified**: 2026-11-21 | **Last Amended**: 2026-11-21
+**Version**: 1.1.0 | **Ratified**: 2026-11-21 | **Last Amended**: 2026-11-21

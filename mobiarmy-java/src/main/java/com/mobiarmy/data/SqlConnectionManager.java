@@ -7,24 +7,27 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SqlConnectionManager {
-    public enum Mode { LocalSqlite, MySql }
+    public enum Mode { LocalSqlite, Postgres }
 
     private static Mode mode = Mode.LocalSqlite;
 
-    private static String mySqlConnectionString;
+    private static String postgresUrl;
+    private static String postgresUser;
+    private static String postgresPassword;
     private static String sqliteConnectionString;
 
     public static void configure(String host, String database, String user, String password) {
-        mySqlConnectionString = String.format("jdbc:mysql://%s/%s?user=%s&password=%s&useSSL=false", 
-                                              host, database, user, password);
+        postgresUrl = "jdbc:postgresql://" + host + "/" + database;
+        postgresUser = user;
+        postgresPassword = password;
     }
 
-    public static void useMySql() {
-        if (mySqlConnectionString == null) {
-            throw new IllegalStateException("SqlConnectionManager.configure(...) must be called before useMySql().");
+    public static void usePostgres() {
+        if (postgresUrl == null) {
+            throw new IllegalStateException("SqlConnectionManager.configure(...) must be called before usePostgres().");
         }
-        mode = Mode.MySql;
-        System.out.println("[SqlConnectionManager] Switched to MySQL.");
+        mode = Mode.Postgres;
+        System.out.println("[SqlConnectionManager] Switched to PostgreSQL.");
     }
 
     public static void useLocalDump(String dumpSqlPath) throws Exception {
@@ -56,11 +59,11 @@ public class SqlConnectionManager {
     }
 
     public static Connection createConnection() throws SQLException {
-        if (mode == Mode.MySql) {
-            if (mySqlConnectionString == null) {
-                throw new IllegalStateException("SqlConnectionManager.configure(...) must be called before createConnection() in MySQL mode.");
+        if (mode == Mode.Postgres) {
+            if (postgresUrl == null) {
+                throw new IllegalStateException("SqlConnectionManager.configure(...) must be called before createConnection() in PostgreSQL mode.");
             }
-            return DriverManager.getConnection(mySqlConnectionString);
+            return DriverManager.getConnection(postgresUrl, postgresUser, postgresPassword);
         }
 
         if (sqliteConnectionString == null) {

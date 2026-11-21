@@ -12,7 +12,9 @@ fixed; the server must speak its protocol exactly. Governing rules live in
 | `Client/SOURCE_ARMYI/` | Client source (Maven) — the source of truth for the wire protocol. |
 | `Army165local/` | Decompiled/obfuscated J2ME client classes (`coreLG.TerrainMidlet`) — reference only. |
 | `Army165sv.jar` | Prebuilt legacy server jar — reference only. |
-| `mobiarmy.sql`, `mobiarmy-java/dbarmy.sql` | MySQL schema + seed dumps. |
+| `mobiarmy-java/dbarmy.sql` | **Canonical** PostgreSQL schema + seed data (also loads into SQLite). |
+| `mobiarmy.sql` | Old MySQL dump (different schema) — reference only. |
+| `mobiarmy-java/sql/` | DB admin scripts (e.g. `create_game_user.sql`). |
 | `data/`, `player_data/`, `*.log` | Runtime data and logs — never hand-edit or commit. |
 
 Inside `mobiarmy-java/src/main/java/com/mobiarmy/`:
@@ -23,17 +25,33 @@ Inside `mobiarmy-java/src/main/java/com/mobiarmy/`:
 - `data/` — static game data (`ItemData`, `MapData`, `NVData`, …) and `SqlConnectionManager`
 
 ## Tech Stack
-- Java 17, Maven (`mobiarmy-java/pom.xml`); deps: mysql-connector-java, sqlite-jdbc, Jackson
+- Java 17, Maven (`mobiarmy-java/pom.xml`); deps: postgresql (JDBC), sqlite-jdbc, Jackson
 - Raw TCP socket server, default port **19149**, one thread per client (cached thread pool)
-- DB: MySQL (`ServerInit` → `SqlConnectionManager.useMySql`), settings from `mysql-*` keys in
-  `army2.conf`; password from env `MYSQL_PASSWORD` (overrides `mysql-password`). Startup fails
-  fast if MySQL is unreachable. `useLocalDump` (throwaway SQLite rebuilt from `dbarmy.sql`) still
-  exists but is unused.
+- DB: PostgreSQL (`ServerInit` → `SqlConnectionManager.usePostgres`), settings from `db-*` keys
+  in `army2.conf` (`db-host` is `host:port`); password from env `DB_PASSWORD` (overrides
+  `db-password`). Startup fails fast if the DB is unreachable. `useLocalDump` (throwaway SQLite
+  rebuilt from `dbarmy.sql`) still exists but is unused.
+- SQL must stay portable: no backtick quoting, unquoted identifiers (PostgreSQL lowercases them),
+  flags as SMALLINT 0/1.
 - Only `exp` and the `online` flag are written back to the DB today; xu, luong, items and
   character changes are not persisted yet.
 - Config: `mobiarmy-java/army2.conf` (port, room counts, limits, resource versions, DB settings)
 
-## Commands (run from `mobiarmy-java/` — paths like `army2.conf`, `dbarmy.sql`, `res/` are relative)
+## Commands
+Primary: Docker, from the repo root (needs `.env`, copied from `.env.example`; see `README.md`):
+```
+docker compose up -d --build     # build server + start db and server (first run seeds the DB)
+docker compose logs -f server    # wait for "Server started on port 19149"
+docker compose restart server    # apply army2.conf edits (mounted read-only, no rebuild)
+docker compose down              # stop, keeps data
+docker compose down -v           # RESET: deletes all game data
+docker compose exec db psql -U postgres -d dbarmy   # SQL shell (DB port is not published)
+```
+Inside Docker the server gets `DB_HOST`/`DB_USER`/`DB_DATABASE`/`DB_PASSWORD` from the environment,
+which overrides `army2.conf`. Container scripts must stay LF (`.gitattributes`).
+
+Without Docker (run from `mobiarmy-java/`, because paths like `army2.conf` and `res/` are relative; needs
+JDK 17, Maven and a reachable PostgreSQL):
 ```
 mvn compile                                                        # build
 mvn compile exec:java -Dexec.mainClass=com.mobiarmy.server.GameServer   # run server

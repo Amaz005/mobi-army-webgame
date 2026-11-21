@@ -1,0 +1,44 @@
+# One-command local stack: `docker compose up -d --build` (see README.md).
+# Secrets come from .env (copy .env.example). The database is not published to the host.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: dbarmy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env (see .env.example)}
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env (see .env.example)}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Init scripts run only when pgdata is empty (first start or after `down -v`).
+      - ./mobiarmy-java/dbarmy.sql:/docker-entrypoint-initdb.d/01-dbarmy.sql:ro
+      - ./docker/db/02-game-user.sh:/docker-entrypoint-initdb.d/02-game-user.sh:ro
+    healthcheck:
+      # TCP check: stays unhealthy during first-run init (which listens on the socket only).
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d dbarmy"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  server:
+    build: ./mobiarmy-java
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db:5432
+      DB_USER: army
+      DB_DATABASE: dbarmy
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env (see .env.example)}
+    ports:
+      - "${GAME_PORT:-19149}:19149"
+    volumes:
+      # Game settings: edit, then `docker compose restart server` (no rebuild).
+      - ./mobiarmy-java/army2.conf:/app/army2.conf:ro
+    # unless-stopped (not on-failure): on DB errors the server exits with code 0.
+    restart: unless-stopped
+    stop_grace_period: 15s
+
+volumes:
+  pgdata: {}
