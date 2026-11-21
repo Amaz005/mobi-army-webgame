@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Browser build of the existing MobiArmy client (spec 002-web-client).
+  Compiles the ORIGINAL client bytecode from ../Army165local (read-only) together with a thin MIDP web layer;
+  TeaVM turns both into client.js and embeds the game resources from the same folder.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.mobiarmy</groupId>
+    <artifactId>web-client</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <!-- 11, not 8: TeaVM's own jars are newer than Java 8 class files. The client source compiles unchanged. -->
+        <maven.compiler.release>11</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <teavm.version>0.12.0</teavm.version>
+        <!-- -Dteavm.minify=false -Dteavm.opt=SIMPLE gives a readable client.js for debugging. -->
+        <teavm.minify>true</teavm.minify>
+        <teavm.opt>ADVANCED</teavm.opt>
+        <client.res>${project.basedir}/../Army165local</client.res>
+        <webapp.out>${project.build.directory}/webapp</webapp.out>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-classlib</artifactId>
+            <version>${teavm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-jso-apis</artifactId>
+            <version>${teavm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-jso</artifactId>
+            <version>${teavm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-interop</artifactId>
+            <version>${teavm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Build-time only: ResourceSupplier (web.build.GameResources) and ASM (web.build.FixGameAction). -->
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-core</artifactId>
+            <version>${teavm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>9.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource><directory>${project.basedir}/src/main/resources</directory></resource>
+            <!-- Game files go on the classpath so TeaVM embeds them (web.build.GameResources). -->
+            <resource>
+                <directory>${client.res}</directory>
+                <excludes>
+                    <exclude>**/*.class</exclude>
+                    <exclude>META-INF/**</exclude>
+                    <exclude>**/.svn/**</exclude>
+                    <exclude>**/Thumbs.db</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <!--
+                      The ORIGINAL client bytecode (not the decompiled source, which lost code in decompilation)
+                      goes into target/classes before compile, so the launcher can reference coreLG.TerrainMidlet
+                      and TeaVM compiles the real program. Army165local itself is never modified.
+                    -->
+                    <execution>
+                        <id>copy-client-classes</id>
+                        <phase>process-resources</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${client.res}</directory>
+                                    <includes><include>*.class</include><include>coreLG/*.class</include></includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-webapp</id>
+                        <phase>process-resources</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${webapp.out}</outputDirectory>
+                            <resources>
+                                <resource><directory>${project.basedir}/src/main/webapp</directory></resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Must run before TeaVM (same phase, declared first): fixes the client's getGameAction self-call. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>fix-game-action</id>
+                        <phase>process-classes</phase>
+                        <goals><goal>java</goal></goals>
+                        <configuration>
+                            <mainClass>web.build.FixGameAction</mainClass>
+                            <arguments><argument>${project.build.outputDirectory}</argument></arguments>
+                            <classpathScope>compile</classpathScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.teavm</groupId>
+                <artifactId>teavm-maven-plugin</artifactId>
+                <version>${teavm.version}</version>
+                <executions>
+                    <execution>
+                        <id>web-client</id>
+                        <phase>process-classes</phase>
+                        <goals><goal>compile</goal></goals>
+                        <configuration>
+                            <mainClass>web.WebMain</mainClass>
+                            <targetDirectory>${webapp.out}</targetDirectory>
+                            <targetFileName>client.js</targetFileName>
+                            <targetType>JAVASCRIPT</targetType>
+                            <minifying>${teavm.minify}</minifying>
+                            <optimizationLevel>${teavm.opt}</optimizationLevel>
+                            <properties>
+                                <mobiarmy.resources>${client.res}</mobiarmy.resources>
+                            </properties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

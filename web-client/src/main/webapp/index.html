@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>MobiArmy</title>
+  <link rel="stylesheet" href="play.css">
+</head>
+<body>
+  <main id="app">
+    <canvas id="screen" width="240" height="320" tabindex="0" aria-label="Game screen"></canvas>
+    <p id="status" role="status"></p>
+    <div id="keypad" hidden></div>
+    <p id="unsupported" hidden>
+      This browser can't run the game. Please use a current Chrome, Edge or Firefox on a computer,
+      or Chrome on Android.
+    </p>
+  </main>
+  <script>
+    (function () {
+      var ok = !!(window.WebSocket && window.localStorage && document.createElement('canvas').getContext
+        && window.Int8Array && window.URLSearchParams);
+      window.mobiarmyStatus = function (text) {
+        var s = document.getElementById('status');
+        s.textContent = text;
+        s.hidden = !text;
+      };
+      if (!ok) {
+        document.getElementById('screen').hidden = true;
+        document.getElementById('unsupported').hidden = false;
+        return;
+      }
+      window.mobiarmyStatus('Loading…');
+      var s = document.createElement('script');
+      s.src = 'client.js';
+      s.onload = function () { main([]); };
+      s.onerror = function () { window.mobiarmyStatus('Could not load the game. Check your connection and reload.'); };
+      document.body.appendChild(s);
+      document.getElementById('screen').focus();
+    })();
+  </script>
+  <script src="keypad.js" defer></script>
+</body>
+</html>

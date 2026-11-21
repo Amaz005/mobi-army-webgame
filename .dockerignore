@@ -1,0 +1,8 @@
+# Build context for web-client/Dockerfile is the repo root; send only what it needs.
+**
+!web-client/pom.xml
+!web-client/src/**
+!Army165local/**
+!docker/web/10-check-public.sh
+**/.svn
+**/target

@@ -9,8 +9,10 @@ fixed; the server must speak its protocol exactly. Governing rules live in
 |------|------|
 | `mobiarmy-java/` | **Canonical server.** All new work goes here. |
 | `archive/mobiarmy/`, `archive/src/` | Older server attempts — reference only, do not develop in them. |
-| `Client/SOURCE_ARMYI/` | Client source (Maven) — the source of truth for the wire protocol. |
-| `Army165local/` | Decompiled/obfuscated J2ME client classes (`coreLG.TerrainMidlet`) — reference only. |
+| `Client/SOURCE_ARMYI/` | Decompiled client source — handy for reading the protocol, but **lossy** (JD-Core dropped code, e.g. `model/y.java`); confirm against bytecode. |
+| `Army165local/` | **Original** J2ME client bytecode + resources (`coreLG.TerrainMidlet`) — never edit; the web client compiles it. |
+| `web-client/` | Browser build of the original client: TeaVM + thin MIDP web layer (`javax/microedition/*`, `web/*`). |
+| `docker/relay/`, `docker/web/` | WebSocket→TCP relay (fixed target `server:19149`) and nginx configs (local/public). |
 | `Army165sv.jar` | Prebuilt legacy server jar — reference only. |
 | `mobiarmy-java/dbarmy.sql` | **Canonical** PostgreSQL schema + seed data (also loads into SQLite). |
 | `mobiarmy.sql` | Old MySQL dump (different schema) — reference only. |
@@ -33,14 +35,14 @@ Inside `mobiarmy-java/src/main/java/com/mobiarmy/`:
   rebuilt from `dbarmy.sql`) still exists but is unused.
 - SQL must stay portable: no backtick quoting, unquoted identifiers (PostgreSQL lowercases them),
   flags as SMALLINT 0/1.
-- Only `exp` and the `online` flag are written back to the DB today; xu, luong, items and
-  character changes are not persisted yet.
+- Only `exp`, the `online` flag and the selected character (`nhanvat`, 1-based) are written back to
+  the DB today; xu, luong, items and character purchases are not persisted yet.
 - Config: `mobiarmy-java/army2.conf` (port, room counts, limits, resource versions, DB settings)
 
 ## Commands
 Primary: Docker, from the repo root (needs `.env`, copied from `.env.example`; see `README.md`):
 ```
-docker compose up -d --build     # build server + start db and server (first run seeds the DB)
+docker compose up -d --build     # build + start db, server, relay, web (first run seeds the DB); browser: http://localhost:8080
 docker compose logs -f server    # wait for "Server started on port 19149"
 docker compose restart server    # apply army2.conf edits (mounted read-only, no rebuild)
 docker compose down              # stop, keeps data
@@ -50,6 +52,17 @@ docker compose exec db psql -U postgres -d dbarmy   # SQL shell (DB port is not 
 Inside Docker the server gets `DB_HOST`/`DB_USER`/`DB_DATABASE`/`DB_PASSWORD` from the environment,
 which overrides `army2.conf`. Container scripts must stay LF (`.gitattributes`).
 
+Web client (`web-client/`, no local JDK needed — build in the Maven image):
+```
+docker run --rm -v "$PWD":/w -v mobiarmy-m2:/root/.m2 -w /w/web-client maven:3.9-eclipse-temurin-17 mvn -B package
+#   add -Dteavm.minify=false -Dteavm.opt=SIMPLE for a readable client.js when debugging
+```
+- The MIDP layer implements only what the original bytecode calls; check with `javap -c` on
+  `Army165local/*.class` before adding APIs. Pure logic lives in `web/*` with JUnit tests.
+- In `@JSBody` scripts, `$`-prefix every local and inner-function parameter (TeaVM's minifier renames
+  parameters but not locals, which caused real collisions).
+- `web.build.FixGameAction` patches the original client's self-recursive `el.getGameAction` at build time.
+
 Without Docker (run from `mobiarmy-java/`, because paths like `army2.conf` and `res/` are relative; needs
 JDK 17, Maven and a reachable PostgreSQL):
 ```
@@ -57,7 +70,9 @@ mvn compile                                                        # build
 mvn compile exec:java -Dexec.mainClass=com.mobiarmy.server.GameServer   # run server
 mvn package                                                        # jar (no shade plugin yet: deps not bundled)
 ```
-There are no automated tests yet. Adding tests for new logic is required (constitution V).
+Unit tests (JUnit 5, `src/test/java`): `mvn test`, or in the Maven image as for the web client
+(`-w /w/mobiarmy-java ... mvn -B test`). Coverage is thin; adding tests for new logic is required
+(constitution V). The server Dockerfile builds with `-DskipTests`.
 
 ## Critical Rules
 1. **Protocol first.** Before changing any message read/write, find the matching handler in

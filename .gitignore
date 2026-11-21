@@ -24,3 +24,6 @@ Thumbs.db
 
 # Legacy VCS metadata
 .svn/
+
+# Web client TLS certificates (public mode)
+docker/web/certs/

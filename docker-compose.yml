@@ -40,5 +40,33 @@ services:
     restart: unless-stopped
     stop_grace_period: 15s
 
+  # --- Web client (spec 002-web-client). db/server never depend on these. ---
+
+  relay:
+    build: ./docker/relay
+    depends_on:
+      - server
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: web-client/Dockerfile
+    depends_on:
+      - relay
+    environment:
+      WEB_MODE: ${WEB_MODE:-local}
+      WEB_DOMAIN: ${WEB_DOMAIN:-}
+      WEB_MAX_CONN_PER_IP: ${WEB_MAX_CONN_PER_IP:-4}
+      WEB_CONN_RATE: ${WEB_CONN_RATE:-10r/m}
+    ports:
+      - "${WEB_PORT:-8080}:8080"        # HTTP (local mode: the game; public mode: redirect + ACME)
+      - "${WEB_TLS_PORT:-8443}:8443"    # HTTPS, public mode only
+    volumes:
+      - ./docker/web/nginx.${WEB_MODE:-local}.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./docker/web/certs:/etc/nginx/certs:ro
+      - ./docker/web/acme:/var/www/acme:ro
+    restart: unless-stopped
+
 volumes:
   pgdata: {}
