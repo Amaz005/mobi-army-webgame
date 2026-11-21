@@ -1,0 +1,110 @@
+[
+{"type":"header","version":"5.2.2","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"dbarmy"},
+{"type":"table","name":"account","database":"dbarmy","data":
+[
+
+]
+}
+,{"type":"table","name":"item","database":"dbarmy","data":
+[
+{"item_id":"1","name":"HP","xu":"0","luong":"-1","nDcMang":"2"},
+{"item_id":"2","name":"Teleport","xu":"0","luong":"-1","nDcMang":"2"},
+{"item_id":"3","name":"Bắn x2","xu":"200","luong":"-1","nDcMang":"1"},
+{"item_id":"4","name":"Di chuyển x2","xu":"70","luong":"-1","nDcMang":"1"},
+{"item_id":"5","name":"Tàng hình","xu":"100","luong":"-1","nDcMang":"1"},
+{"item_id":"6","name":"Ngưng gió","xu":"100","luong":"-1","nDcMang":"1"},
+{"item_id":"7","name":"Bom phá đất","xu":"200","luong":"-1","nDcMang":"1"},
+{"item_id":"8","name":"Lựu đạn","xu":"200","luong":"-1","nDcMang":"1"},
+{"item_id":"9","name":"Bom hủy diệt","xu":"500","luong":"-1","nDcMang":"1"},
+{"item_id":"10","name":"Tơ nhện","xu":"200","luong":"-1","nDcMang":"1"},
+{"item_id":"11","name":"HP đồng đội","xu":"700","luong":"-1","nDcMang":"1"},
+{"item_id":"12","name":"Đạn trái phá","xu":"500","luong":"-1","nDcMang":"1"},
+{"item_id":"13","name":"Túi đựng item 1","xu":"100","luong":"-1","nDcMang":"-1"},
+{"item_id":"14","name":"Túi đựng item 2","xu":"200","luong":"-1","nDcMang":"-1"},
+{"item_id":"15","name":"Túi đựng item 3","xu":"300","luong":"-1","nDcMang":"-1"},
+{"item_id":"16","name":"Túi đựng item 4","xu":"400","luong":"-1","nDcMang":"-1"},
+{"item_id":"17","name":"Đạn lazer","xu":"500","luong":"-1","nDcMang":"1"},
+{"item_id":"18","name":"Vòi rồng","xu":"200","luong":"-1","nDcMang":"1"},
+{"item_id":"19","name":"Chuột gắn bom","xu":"400","luong":"-1","nDcMang":"1"},
+{"item_id":"20","name":"Tên lửa","xu":"300","luong":"-1","nDcMang":"1"},
+{"item_id":"21","name":"Đạn xuyên đất","xu":"300","luong":"-1","nDcMang":"1"},
+{"item_id":"22","name":"Sao băng","xu":"400","luong":"-1","nDcMang":"1"},
+{"item_id":"23","name":"Mưa đạn","xu":"500","luong":"-1","nDcMang":"1"},
+{"item_id":"24","name":"Khoang đất","xu":"150","luong":"-1","nDcMang":"1"},
+{"item_id":"25","name":"Tự sát","xu":"600","luong":"-1","nDcMang":"1"},
+{"item_id":"26","name":"Bom mù","xu":"600","luong":"-1","nDcMang":"1"},
+{"item_id":"27","name":"Khoang đất 2","xu":"500","luong":"-1","nDcMang":"1"},
+{"item_id":"28","name":"UFO","xu":"500","luong":"-1","nDcMang":"1"},
+{"item_id":"29","name":"Đóng băng","xu":"300","luong":"-1","nDcMang":"1"},
+{"item_id":"30","name":"Khói độc","xu":"700","luong":"-1","nDcMang":"1"},
+{"item_id":"31","name":"Tơ nhện 2","xu":"600","luong":"-1","nDcMang":"1"},
+{"item_id":"32","name":"Bom hẹn giờ","xu":"400","luong":"-1","nDcMang":"1"},
+{"item_id":"33","name":"HP 50%","xu":"500","luong":"-1","nDcMang":"1"},
+{"item_id":"34","name":"HP 100%","xu":"1000","luong":"-1","nDcMang":"1"},
+{"item_id":"35","name":"Vô hinh","xu":"500","luong":"-1","nDcMang":"1"},
+{"item_id":"36","name":"Ma cà rồng","xu":"800","luong":"-1","nDcMang":"1"}
+]
+}
+,{"type":"table","name":"map","database":"dbarmy","data":
+[
+{"id":"1","name":"Cây cầu băng","file":"bangtuyet_caycaubang.map","bg":"7","mapAddY":"0","bullEffShower":"0","inWaterAddY":"-10","cl2AddY":"0"},
+{"id":"2","name":"Sống sót","file":"bangtuyet_songsot.map","bg":"0","mapAddY":"-10","bullEffShower":"-50","inWaterAddY":"-10","cl2AddY":"0"},
+{"id":"3","name":"Khu năng lượng","file":"bencang_khunangluong.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"4","name":"Nhà máy điện","file":"bencang_nhamaydien.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"5","name":"Bãi nước trũng","file":"bien_bainuoctrung.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"6","name":"Đảo rêu","file":"bien_daoreu.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"7","name":"Đảo vòng cung","file":"bien_daovongcung.map","bg":"1","mapAddY":"170","bullEffShower":"-100","inWaterAddY":"0","cl2AddY":"1"},
+{"id":"8","name":"Dãy đá ngầm","file":"bien_daydangam.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"9","name":"Thuyền trôi","file":"bien_thuyentroi.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"10","name":"Cầu tre","file":"bobien_cautre.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"11","name":"Đảo dừa","file":"bobien_daodua.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"12","name":"Đảo giun","file":"bobien_daogiun.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"13","name":"Căn cứ thép","file":"cancuthep_cancuthep.map","bg":"6","mapAddY":"90","bullEffShower":"0","inWaterAddY":"30","cl2AddY":"0"},
+{"id":"14","name":"Sân bay","file":"cancuthep_sanbay.map","bg":"6","mapAddY":"90","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"15","name":"Trụ điện ","file":"cancuthep_trudien.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"16","name":"Cheo leo","file":"dinhnui_cheoleo.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"17","name":"Chơi vơi","file":"dinhnui_choivoi.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"18","name":"Hang tuyết","file":"dinhnui_hangtuyet.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"19","name":"Bãi khai thác","file":"dongco_baikhaithac.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"20","name":"Đồng cỏ","file":"dongco_dongco.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"21","name":"Vách núi","file":"dongco_vachnui.map","bg":"4","mapAddY":"100","bullEffShower":"-100","inWaterAddY":"0","cl2AddY":"2"},
+{"id":"22","name":"Vực thẳm chết","file":"dongco_vucthamchet.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"23","name":"Chiến trường","file":"hoangmac_chientruong.map","bg":"1","mapAddY":"170","bullEffShower":"-100","inWaterAddY":"0","cl2AddY":"1"},
+{"id":"24","name":"Đảo uông luông","file":"hoangmac_daouongluong.map","bg":"0","mapAddY":"170","bullEffShower":"-50","inWaterAddY":"0","cl2AddY":"-1"},
+{"id":"25","name":"Đồi cát","file":"hoangmac_doicat.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"26","name":"Khu sụp lún","file":"hoangmac_khusuplun.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"27","name":"Mỏm đá tử thần","file":"hoangmac_momdatuthan.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"28","name":"Bên dưới hố sâu","file":"rungchet_benduoihosau.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"29","name":"Hòn đất","file":"rungchet_hondat.map","bg":"1","mapAddY":"170","bullEffShower":"-50","inWaterAddY":"0","cl2AddY":"-1"},
+{"id":"30","name":"Khu giao tranh","file":"rungchet_khugiaotranh.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"31","name":"Sống hoặc chết","file":"rungchet_songhoackhet.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"32","name":"Đài tế thần","file":"thanhphoco_daitethan.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"33","name":"Đền Hoàng","file":"thanhphoco_denhoang.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"34","name":"Pháo thành","file":"thanhphoco_phaothanh.map","bg":"0","mapAddY":"0","bullEffShower":"0","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"82","name":"Ngẫu nhiên","file":"randomMap.map","bg":"13","mapAddY":"-1","bullEffShower":"80","inWaterAddY":"-1","cl2AddY":"-1"},
+{"id":"83","name":"Bom 1","file":"boss_bom1.map","bg":"7","mapAddY":"-1","bullEffShower":"-80","inWaterAddY":"-42","cl2AddY":"0"},
+{"id":"84","name":"Bom 2","file":"boss_bom2.map","bg":"7","mapAddY":"-1","bullEffShower":"-80","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"85","name":"Thành phố nhện","file":"boss_nhenmay.map","bg":"10","mapAddY":"-1","bullEffShower":"45","inWaterAddY":"-10","cl2AddY":"0"},
+{"id":"86","name":"Thành phố máy","file":"boss_robot.map","bg":"10","mapAddY":"-1","bullEffShower":"45","inWaterAddY":"-1","cl2AddY":"-1"},
+{"id":"87","name":"Khủng long máy","file":"boss_trex.map","bg":"7","mapAddY":"-1","bullEffShower":"-80","inWaterAddY":"0","cl2AddY":"0"},
+{"id":"88","name":"Khu vực cấm","file":"boss_ufo.map","bg":"12","mapAddY":"-1","bullEffShower":"-50","inWaterAddY":"200","cl2AddY":"2"},
+{"id":"89","name":"Đỉnh hi mã lạp sơn","file":"boss_ballon.map","bg":"2","mapAddY":"-1","bullEffShower":"-50","inWaterAddY":"-1","cl2AddY":"-1"},
+{"id":"90","name":"Hang nhện","file":"boss_hangnhen.map","bg":"13","mapAddY":"-1","bullEffShower":"80","inWaterAddY":"-1","cl2AddY":"-1"}
+]
+}
+,{"type":"table","name":"nhanvat","database":"dbarmy","data":
+[
+{"nhanvat_id":"1","name":"Gunner","xu":"0","luong":"0","ma_sat_gio":"80","goc_min":"-45","sat_thuong":"280","sat_thuong_dan":"28","so_dan":"1"},
+{"nhanvat_id":"2","name":"Miss 6","xu":"0","luong":"0","ma_sat_gio":"50","goc_min":"-45","sat_thuong":"290","sat_thuong_dan":"14","so_dan":"2"},
+{"nhanvat_id":"3","name":"Electician","xu":"0","luong":"0","ma_sat_gio":"80","goc_min":"-45","sat_thuong":"300","sat_thuong_dan":"10","so_dan":"3"},
+{"nhanvat_id":"4","name":"King Kong","xu":"40000","luong":"32","ma_sat_gio":"40","goc_min":"30","sat_thuong":"420","sat_thuong_dan":"10","so_dan":"4"},
+{"nhanvat_id":"5","name":"Rocketer","xu":"30000","luong":"24","ma_sat_gio":"50","goc_min":"20","sat_thuong":"321","sat_thuong_dan":"12","so_dan":"3"},
+{"nhanvat_id":"6","name":"Granos","xu":"20000","luong":"16","ma_sat_gio":"30","goc_min":"30","sat_thuong":"310","sat_thuong_dan":"7","so_dan":"5"},
+{"nhanvat_id":"7","name":"Chicky","xu":"100000","luong":"80","ma_sat_gio":"20","goc_min":"-45","sat_thuong":"450","sat_thuong_dan":"23","so_dan":"2"},
+{"nhanvat_id":"8","name":"Tarzan","xu":"50000","luong":"40","ma_sat_gio":"10","goc_min":"1","sat_thuong":"340","sat_thuong_dan":"30","so_dan":"1"},
+{"nhanvat_id":"9","name":"Apache","xu":"70000","luong":"64","ma_sat_gio":"30","goc_min":"-45","sat_thuong":"431","sat_thuong_dan":"11","so_dan":"4"},
+{"nhanvat_id":"10","name":"Magenta","xu":"120000","luong":"96","ma_sat_gio":"40","goc_min":"20","sat_thuong":"410","sat_thuong_dan":"35","so_dan":"1"}
+]
+}
+]

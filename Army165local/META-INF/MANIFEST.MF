@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+MIDlet-Vendor: Midlet Suite Vendor
+MIDlet-Version: 1.6.5
+MIDlet-1: Army165,,coreLG.TerrainMidlet
+MicroEdition-Configuration: CLDC-1.0
+MIDlet-Name: Army165 Midlet Suite
+MicroEdition-Profile: MIDP-2.0
+

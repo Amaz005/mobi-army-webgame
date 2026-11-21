@@ -1,0 +1,26 @@
+# Build output
+target/
+
+# Runtime data and logs
+*.log
+log.txt
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+player_data/
+cache/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Legacy VCS metadata
+.svn/

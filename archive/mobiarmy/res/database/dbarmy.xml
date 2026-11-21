@@ -1,0 +1,877 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- phpMyAdmin XML Dump
+- version 5.2.2
+- https://www.phpmyadmin.net
+-
+- Máy chủ: localhost
+- Thời gian đã tạo: Th10 07, 2025 lúc 03:09 PM
+- Phiên bản máy phục vụ: 5.7.34
+- Phiên bản PHP: 8.2.6
+-->
+
+<pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
+    <!--
+    - Structure schemas
+    -->
+    <pma:structure_schemas>
+        <pma:database name="dbarmy" collation="utf8_general_ci" charset="utf8">
+            <pma:table name="account">
+                CREATE TABLE `account` (
+                  `id` int(11) NOT NULL,
+                  `username` varchar(20) NOT NULL,
+                  `password` varchar(50) NOT NULL,
+                  `xu` int(10) NOT NULL,
+                  `luong` int(6) NOT NULL,
+                  `online` tinyint(4) NOT NULL,
+                  `itembag` varchar(500) NOT NULL DEFAULT &#039;[]&#039;,
+                  `superadmin` tinyint(4) NOT NULL,
+                  `banbe` varchar(500) NOT NULL DEFAULT &#039;[]&#039;,
+                  `nhanvat` int(11) NOT NULL,
+                  `exp` int(11) NOT NULL,
+                  `killdead` varchar(500) DEFAULT &#039;[]&#039;,
+                  `thongtin` varchar(500) DEFAULT &#039;[]&#039;
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:table name="item">
+                CREATE TABLE `item` (
+                  `item_id` tinyint(3) NOT NULL AUTO_INCREMENT,
+                  `name` varchar(15) COLLATE utf8_bin NOT NULL,
+                  `xu` smallint(4) NOT NULL,
+                  `luong` smallint(3) NOT NULL,
+                  `nDcMang` smallint(3) NOT NULL,
+                  PRIMARY KEY (`item_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+            </pma:table>
+            <pma:table name="map">
+                CREATE TABLE `map` (
+                  `id` tinyint(3) NOT NULL AUTO_INCREMENT,
+                  `name` varchar(30) COLLATE utf8_bin NOT NULL,
+                  `file` varchar(100) COLLATE utf8_bin NOT NULL,
+                  `bg` smallint(5) NOT NULL DEFAULT &#039;0&#039;,
+                  `mapAddY` smallint(5) NOT NULL DEFAULT &#039;0&#039;,
+                  `bullEffShower` smallint(5) NOT NULL DEFAULT &#039;0&#039;,
+                  `inWaterAddY` smallint(5) NOT NULL DEFAULT &#039;0&#039;,
+                  `cl2AddY` smallint(5) NOT NULL DEFAULT &#039;0&#039;,
+                  PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+            </pma:table>
+            <pma:table name="nhanvat">
+                CREATE TABLE `nhanvat` (
+                  `nhanvat_id` tinyint(3) NOT NULL AUTO_INCREMENT,
+                  `name` varchar(15) COLLATE utf8_bin NOT NULL,
+                  `xu` int(10) NOT NULL,
+                  `luong` smallint(3) NOT NULL,
+                  `ma_sat_gio` smallint(4) NOT NULL,
+                  `goc_min` smallint(4) NOT NULL,
+                  `sat_thuong` smallint(4) NOT NULL,
+                  `sat_thuong_dan` smallint(4) NOT NULL,
+                  `so_dan` smallint(4) NOT NULL,
+                  PRIMARY KEY (`nhanvat_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+            </pma:table>
+        </pma:database>
+    </pma:structure_schemas>
+
+    <!--
+    - Cơ sở dữ liệu: 'dbarmy'
+    -->
+    <database name="dbarmy">
+        <!-- Bảng account -->
+        <!-- Bảng item -->
+        <table name="item">
+            <column name="item_id">1</column>
+            <column name="name">HP</column>
+            <column name="xu">0</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">2</column>
+        </table>
+        <table name="item">
+            <column name="item_id">2</column>
+            <column name="name">Teleport</column>
+            <column name="xu">0</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">2</column>
+        </table>
+        <table name="item">
+            <column name="item_id">3</column>
+            <column name="name">Bắn x2</column>
+            <column name="xu">200</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">4</column>
+            <column name="name">Di chuyển x2</column>
+            <column name="xu">70</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">5</column>
+            <column name="name">Tàng hình</column>
+            <column name="xu">100</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">6</column>
+            <column name="name">Ngưng gió</column>
+            <column name="xu">100</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">7</column>
+            <column name="name">Bom phá đất</column>
+            <column name="xu">200</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">8</column>
+            <column name="name">Lựu đạn</column>
+            <column name="xu">200</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">9</column>
+            <column name="name">Bom hủy diệt</column>
+            <column name="xu">500</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">10</column>
+            <column name="name">Tơ nhện</column>
+            <column name="xu">200</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">11</column>
+            <column name="name">HP đồng đội</column>
+            <column name="xu">700</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">12</column>
+            <column name="name">Đạn trái phá</column>
+            <column name="xu">500</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">13</column>
+            <column name="name">Túi đựng item 1</column>
+            <column name="xu">100</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">-1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">14</column>
+            <column name="name">Túi đựng item 2</column>
+            <column name="xu">200</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">-1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">15</column>
+            <column name="name">Túi đựng item 3</column>
+            <column name="xu">300</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">-1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">16</column>
+            <column name="name">Túi đựng item 4</column>
+            <column name="xu">400</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">-1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">17</column>
+            <column name="name">Đạn lazer</column>
+            <column name="xu">500</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">18</column>
+            <column name="name">Vòi rồng</column>
+            <column name="xu">200</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">19</column>
+            <column name="name">Chuột gắn bom</column>
+            <column name="xu">400</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">20</column>
+            <column name="name">Tên lửa</column>
+            <column name="xu">300</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">21</column>
+            <column name="name">Đạn xuyên đất</column>
+            <column name="xu">300</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">22</column>
+            <column name="name">Sao băng</column>
+            <column name="xu">400</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">23</column>
+            <column name="name">Mưa đạn</column>
+            <column name="xu">500</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">24</column>
+            <column name="name">Khoang đất</column>
+            <column name="xu">150</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">25</column>
+            <column name="name">Tự sát</column>
+            <column name="xu">600</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">26</column>
+            <column name="name">Bom mù</column>
+            <column name="xu">600</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">27</column>
+            <column name="name">Khoang đất 2</column>
+            <column name="xu">500</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">28</column>
+            <column name="name">UFO</column>
+            <column name="xu">500</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">29</column>
+            <column name="name">Đóng băng</column>
+            <column name="xu">300</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">30</column>
+            <column name="name">Khói độc</column>
+            <column name="xu">700</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">31</column>
+            <column name="name">Tơ nhện 2</column>
+            <column name="xu">600</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">32</column>
+            <column name="name">Bom hẹn giờ</column>
+            <column name="xu">400</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">33</column>
+            <column name="name">HP 50%</column>
+            <column name="xu">500</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">34</column>
+            <column name="name">HP 100%</column>
+            <column name="xu">1000</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">35</column>
+            <column name="name">Vô hinh</column>
+            <column name="xu">500</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <table name="item">
+            <column name="item_id">36</column>
+            <column name="name">Ma cà rồng</column>
+            <column name="xu">800</column>
+            <column name="luong">-1</column>
+            <column name="nDcMang">1</column>
+        </table>
+        <!-- Bảng map -->
+        <table name="map">
+            <column name="id">1</column>
+            <column name="name">Cây cầu băng</column>
+            <column name="file">bangtuyet_caycaubang.map</column>
+            <column name="bg">7</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">-10</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">2</column>
+            <column name="name">Sống sót</column>
+            <column name="file">bangtuyet_songsot.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">-10</column>
+            <column name="bullEffShower">-50</column>
+            <column name="inWaterAddY">-10</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">3</column>
+            <column name="name">Khu năng lượng</column>
+            <column name="file">bencang_khunangluong.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">4</column>
+            <column name="name">Nhà máy điện</column>
+            <column name="file">bencang_nhamaydien.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">5</column>
+            <column name="name">Bãi nước trũng</column>
+            <column name="file">bien_bainuoctrung.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">6</column>
+            <column name="name">Đảo rêu</column>
+            <column name="file">bien_daoreu.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">7</column>
+            <column name="name">Đảo vòng cung</column>
+            <column name="file">bien_daovongcung.map</column>
+            <column name="bg">1</column>
+            <column name="mapAddY">170</column>
+            <column name="bullEffShower">-100</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">1</column>
+        </table>
+        <table name="map">
+            <column name="id">8</column>
+            <column name="name">Dãy đá ngầm</column>
+            <column name="file">bien_daydangam.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">9</column>
+            <column name="name">Thuyền trôi</column>
+            <column name="file">bien_thuyentroi.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">10</column>
+            <column name="name">Cầu tre</column>
+            <column name="file">bobien_cautre.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">11</column>
+            <column name="name">Đảo dừa</column>
+            <column name="file">bobien_daodua.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">12</column>
+            <column name="name">Đảo giun</column>
+            <column name="file">bobien_daogiun.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">13</column>
+            <column name="name">Căn cứ thép</column>
+            <column name="file">cancuthep_cancuthep.map</column>
+            <column name="bg">6</column>
+            <column name="mapAddY">90</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">30</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">14</column>
+            <column name="name">Sân bay</column>
+            <column name="file">cancuthep_sanbay.map</column>
+            <column name="bg">6</column>
+            <column name="mapAddY">90</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">15</column>
+            <column name="name">Trụ điện </column>
+            <column name="file">cancuthep_trudien.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">16</column>
+            <column name="name">Cheo leo</column>
+            <column name="file">dinhnui_cheoleo.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">17</column>
+            <column name="name">Chơi vơi</column>
+            <column name="file">dinhnui_choivoi.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">18</column>
+            <column name="name">Hang tuyết</column>
+            <column name="file">dinhnui_hangtuyet.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">19</column>
+            <column name="name">Bãi khai thác</column>
+            <column name="file">dongco_baikhaithac.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">20</column>
+            <column name="name">Đồng cỏ</column>
+            <column name="file">dongco_dongco.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">21</column>
+            <column name="name">Vách núi</column>
+            <column name="file">dongco_vachnui.map</column>
+            <column name="bg">4</column>
+            <column name="mapAddY">100</column>
+            <column name="bullEffShower">-100</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">2</column>
+        </table>
+        <table name="map">
+            <column name="id">22</column>
+            <column name="name">Vực thẳm chết</column>
+            <column name="file">dongco_vucthamchet.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">23</column>
+            <column name="name">Chiến trường</column>
+            <column name="file">hoangmac_chientruong.map</column>
+            <column name="bg">1</column>
+            <column name="mapAddY">170</column>
+            <column name="bullEffShower">-100</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">1</column>
+        </table>
+        <table name="map">
+            <column name="id">24</column>
+            <column name="name">Đảo uông luông</column>
+            <column name="file">hoangmac_daouongluong.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">170</column>
+            <column name="bullEffShower">-50</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">-1</column>
+        </table>
+        <table name="map">
+            <column name="id">25</column>
+            <column name="name">Đồi cát</column>
+            <column name="file">hoangmac_doicat.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">26</column>
+            <column name="name">Khu sụp lún</column>
+            <column name="file">hoangmac_khusuplun.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">27</column>
+            <column name="name">Mỏm đá tử thần</column>
+            <column name="file">hoangmac_momdatuthan.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">28</column>
+            <column name="name">Bên dưới hố sâu</column>
+            <column name="file">rungchet_benduoihosau.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">29</column>
+            <column name="name">Hòn đất</column>
+            <column name="file">rungchet_hondat.map</column>
+            <column name="bg">1</column>
+            <column name="mapAddY">170</column>
+            <column name="bullEffShower">-50</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">-1</column>
+        </table>
+        <table name="map">
+            <column name="id">30</column>
+            <column name="name">Khu giao tranh</column>
+            <column name="file">rungchet_khugiaotranh.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">31</column>
+            <column name="name">Sống hoặc chết</column>
+            <column name="file">rungchet_songhoackhet.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">32</column>
+            <column name="name">Đài tế thần</column>
+            <column name="file">thanhphoco_daitethan.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">33</column>
+            <column name="name">Đền Hoàng</column>
+            <column name="file">thanhphoco_denhoang.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">34</column>
+            <column name="name">Pháo thành</column>
+            <column name="file">thanhphoco_phaothanh.map</column>
+            <column name="bg">0</column>
+            <column name="mapAddY">0</column>
+            <column name="bullEffShower">0</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">82</column>
+            <column name="name">Ngẫu nhiên</column>
+            <column name="file">randomMap.map</column>
+            <column name="bg">13</column>
+            <column name="mapAddY">-1</column>
+            <column name="bullEffShower">80</column>
+            <column name="inWaterAddY">-1</column>
+            <column name="cl2AddY">-1</column>
+        </table>
+        <table name="map">
+            <column name="id">83</column>
+            <column name="name">Bom 1</column>
+            <column name="file">boss_bom1.map</column>
+            <column name="bg">7</column>
+            <column name="mapAddY">-1</column>
+            <column name="bullEffShower">-80</column>
+            <column name="inWaterAddY">-42</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">84</column>
+            <column name="name">Bom 2</column>
+            <column name="file">boss_bom2.map</column>
+            <column name="bg">7</column>
+            <column name="mapAddY">-1</column>
+            <column name="bullEffShower">-80</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">85</column>
+            <column name="name">Thành phố nhện</column>
+            <column name="file">boss_nhenmay.map</column>
+            <column name="bg">10</column>
+            <column name="mapAddY">-1</column>
+            <column name="bullEffShower">45</column>
+            <column name="inWaterAddY">-10</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">86</column>
+            <column name="name">Thành phố máy</column>
+            <column name="file">boss_robot.map</column>
+            <column name="bg">10</column>
+            <column name="mapAddY">-1</column>
+            <column name="bullEffShower">45</column>
+            <column name="inWaterAddY">-1</column>
+            <column name="cl2AddY">-1</column>
+        </table>
+        <table name="map">
+            <column name="id">87</column>
+            <column name="name">Khủng long máy</column>
+            <column name="file">boss_trex.map</column>
+            <column name="bg">7</column>
+            <column name="mapAddY">-1</column>
+            <column name="bullEffShower">-80</column>
+            <column name="inWaterAddY">0</column>
+            <column name="cl2AddY">0</column>
+        </table>
+        <table name="map">
+            <column name="id">88</column>
+            <column name="name">Khu vực cấm</column>
+            <column name="file">boss_ufo.map</column>
+            <column name="bg">12</column>
+            <column name="mapAddY">-1</column>
+            <column name="bullEffShower">-50</column>
+            <column name="inWaterAddY">200</column>
+            <column name="cl2AddY">2</column>
+        </table>
+        <table name="map">
+            <column name="id">89</column>
+            <column name="name">Đỉnh hi mã lạp sơn</column>
+            <column name="file">boss_ballon.map</column>
+            <column name="bg">2</column>
+            <column name="mapAddY">-1</column>
+            <column name="bullEffShower">-50</column>
+            <column name="inWaterAddY">-1</column>
+            <column name="cl2AddY">-1</column>
+        </table>
+        <table name="map">
+            <column name="id">90</column>
+            <column name="name">Hang nhện</column>
+            <column name="file">boss_hangnhen.map</column>
+            <column name="bg">13</column>
+            <column name="mapAddY">-1</column>
+            <column name="bullEffShower">80</column>
+            <column name="inWaterAddY">-1</column>
+            <column name="cl2AddY">-1</column>
+        </table>
+        <!-- Bảng nhanvat -->
+        <table name="nhanvat">
+            <column name="nhanvat_id">1</column>
+            <column name="name">Gunner</column>
+            <column name="xu">0</column>
+            <column name="luong">0</column>
+            <column name="ma_sat_gio">80</column>
+            <column name="goc_min">-45</column>
+            <column name="sat_thuong">280</column>
+            <column name="sat_thuong_dan">28</column>
+            <column name="so_dan">1</column>
+        </table>
+        <table name="nhanvat">
+            <column name="nhanvat_id">2</column>
+            <column name="name">Miss 6</column>
+            <column name="xu">0</column>
+            <column name="luong">0</column>
+            <column name="ma_sat_gio">50</column>
+            <column name="goc_min">-45</column>
+            <column name="sat_thuong">290</column>
+            <column name="sat_thuong_dan">14</column>
+            <column name="so_dan">2</column>
+        </table>
+        <table name="nhanvat">
+            <column name="nhanvat_id">3</column>
+            <column name="name">Electician</column>
+            <column name="xu">0</column>
+            <column name="luong">0</column>
+            <column name="ma_sat_gio">80</column>
+            <column name="goc_min">-45</column>
+            <column name="sat_thuong">300</column>
+            <column name="sat_thuong_dan">10</column>
+            <column name="so_dan">3</column>
+        </table>
+        <table name="nhanvat">
+            <column name="nhanvat_id">4</column>
+            <column name="name">King Kong</column>
+            <column name="xu">40000</column>
+            <column name="luong">32</column>
+            <column name="ma_sat_gio">40</column>
+            <column name="goc_min">30</column>
+            <column name="sat_thuong">420</column>
+            <column name="sat_thuong_dan">10</column>
+            <column name="so_dan">4</column>
+        </table>
+        <table name="nhanvat">
+            <column name="nhanvat_id">5</column>
+            <column name="name">Rocketer</column>
+            <column name="xu">30000</column>
+            <column name="luong">24</column>
+            <column name="ma_sat_gio">50</column>
+            <column name="goc_min">20</column>
+            <column name="sat_thuong">321</column>
+            <column name="sat_thuong_dan">12</column>
+            <column name="so_dan">3</column>
+        </table>
+        <table name="nhanvat">
+            <column name="nhanvat_id">6</column>
+            <column name="name">Granos</column>
+            <column name="xu">20000</column>
+            <column name="luong">16</column>
+            <column name="ma_sat_gio">30</column>
+            <column name="goc_min">30</column>
+            <column name="sat_thuong">310</column>
+            <column name="sat_thuong_dan">7</column>
+            <column name="so_dan">5</column>
+        </table>
+        <table name="nhanvat">
+            <column name="nhanvat_id">7</column>
+            <column name="name">Chicky</column>
+            <column name="xu">100000</column>
+            <column name="luong">80</column>
+            <column name="ma_sat_gio">20</column>
+            <column name="goc_min">-45</column>
+            <column name="sat_thuong">450</column>
+            <column name="sat_thuong_dan">23</column>
+            <column name="so_dan">2</column>
+        </table>
+        <table name="nhanvat">
+            <column name="nhanvat_id">8</column>
+            <column name="name">Tarzan</column>
+            <column name="xu">50000</column>
+            <column name="luong">40</column>
+            <column name="ma_sat_gio">10</column>
+            <column name="goc_min">1</column>
+            <column name="sat_thuong">340</column>
+            <column name="sat_thuong_dan">30</column>
+            <column name="so_dan">1</column>
+        </table>
+        <table name="nhanvat">
+            <column name="nhanvat_id">9</column>
+            <column name="name">Apache</column>
+            <column name="xu">70000</column>
+            <column name="luong">64</column>
+            <column name="ma_sat_gio">30</column>
+            <column name="goc_min">-45</column>
+            <column name="sat_thuong">431</column>
+            <column name="sat_thuong_dan">11</column>
+            <column name="so_dan">4</column>
+        </table>
+        <table name="nhanvat">
+            <column name="nhanvat_id">10</column>
+            <column name="name">Magenta</column>
+            <column name="xu">120000</column>
+            <column name="luong">96</column>
+            <column name="ma_sat_gio">40</column>
+            <column name="goc_min">20</column>
+            <column name="sat_thuong">410</column>
+            <column name="sat_thuong_dan">35</column>
+            <column name="so_dan">1</column>
+        </table>
+    </database>
+</pma_xml_export>
