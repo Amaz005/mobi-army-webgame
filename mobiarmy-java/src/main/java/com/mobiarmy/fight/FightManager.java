@@ -196,6 +196,7 @@ public class FightManager {
 
         if (ltap) {
             userLt.setFightManager(this);
+            userLt.setState(User.State.Fighting);
             players = new Player[ServerManager.maxPlayers];
             players[0] = new Player(this, (byte)0, ServerManager.xLtap[0], ServerManager.yLtap[0], Player.getLuyenTapItem(), 0, userLt);
             players[1] = new Player(this, (byte)1, ServerManager.xLtap[1], ServerManager.yLtap[1], Player.getLuyenTapItem(), 0, userLt);
@@ -223,6 +224,9 @@ public class FightManager {
                 teamlevel += us.getLevel();
                 us.updateXu(-wait.money);
                 us.setFightManager(this);
+                // In-match commands (shoot, move, items…) are only accepted in Fighting state;
+                // endGame resets this to WaitFight.
+                us.setState(User.State.Fighting);
 
                 int locaCount;
                 boolean exists;
@@ -417,6 +421,7 @@ public class FightManager {
                 new Thread(() -> {
                     try {
                         Thread.sleep(delayMs);
+                        nextHP();
                         nextTurn();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -426,6 +431,8 @@ public class FightManager {
                 new Thread(() -> {
                     try {
                         Thread.sleep(delayMs);
+                        // Damage was applied while the shot was simulated; show it once the bullet lands.
+                        nextHP();
                         if (!checkWin()) {
                             nextTurn();
                         }
@@ -436,6 +443,7 @@ public class FightManager {
             } else {
                 try {
                     Thread.sleep(delayMs);
+                    nextHP();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -923,21 +931,22 @@ public class FightManager {
         nTurn = 0;
     }
 
+    /**
+     * Sends message 51 for each player whose HP changed. Client 1.6.5 reads one player per message:
+     * byte index, short hp, byte pixel (checked against bb.class bytecode).
+     */
     public void nextHP() {
-        try {
-            Message ms = new Message(51);
-            ms.sendByte(allCount);
-            for (int i = 0; i < allCount; i++) {
-                Player pl = players[i];
-                if (pl != null) {
-                    ms.sendInt(pl.hp).sendByte(pl.pixel);
-                    if (pl.isDie) ms.sendInt(pl.xpUp).sendInt(pl.allXpUp);
-                } else {
-                    ms.sendInt(0).sendByte(0);
-                }
+        for (int i = 0; i < allCount; i++) {
+            Player pl = players[i];
+            if (pl == null || !pl.isUpdateHP) continue;
+            pl.isUpdateHP = false;
+            try {
+                sendToTeam(new Message(51).sendByte((byte) i)
+                        .sendShort((short) Math.min(pl.hp, Short.MAX_VALUE)).sendByte(pl.pixel));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            sendToTeam(ms);
-        } catch (Exception e) {}
+        }
     }
 
     public void nextWind() {

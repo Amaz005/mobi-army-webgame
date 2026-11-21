@@ -126,6 +126,9 @@ public final class MessageHandler implements IMessageHandler {
                 case 34:
                     // client.user.viewTtMessage(mss);
                     break;
+                case 35:
+                    if (client.user == null) client.registerMessage(mss);
+                    break;
                 case 36:
                     // client.user.findUserMessage(mss);
                     break;
@@ -145,7 +148,7 @@ public final class MessageHandler implements IMessageHandler {
                     if (waitFight()) client.user.getFightWait().setItemMessage(client.user, mss);
                     break;
                 case 69:
-                    // if (waiting()) client.user.selectNvMessage(mss);
+                    if (waiting() || waitFight()) client.user.selectNvMessage(mss);
                     break;
                 case 71:
                     if (waitFight()) client.user.getFightWait().doiPheMessage(client.user, mss);

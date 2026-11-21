@@ -519,8 +519,13 @@ public class FightWait {
                     }
                     fight = new FightManager(this);
                     fight.startGame(0, 0);
+                    return;
                 }
             }
+            // The client waits on "Xin chờ..." after asking to start; answer so it doesn't hang.
+            cl.sendMessage(new Message(4).sendUTF(numPlayer < 2
+                    ? "Cần ít nhất 2 người chơi để bắt đầu."
+                    : "Còn người chơi chưa sẵn sàng."));
         } catch (Exception e) { e.printStackTrace(); }
     }
 }

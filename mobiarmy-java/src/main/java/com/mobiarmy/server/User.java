@@ -219,6 +219,39 @@ public class User {
         }
     }
 
+    /** True if {@code index} is a character this player owns. */
+    static boolean canSelectNv(boolean[] owned, int index) {
+        return owned != null && index >= 0 && index < owned.length && owned[index];
+    }
+
+    /**
+     * Command 69: pick a character. The client shows "Xin chờ..." until it gets 69 back
+     * (int player id, byte character index). The choice is saved to account.nhanvat (1-based).
+     */
+    public void selectNvMessage(Message mss) {
+        try {
+            int index = mss.readByte();
+            if (!canSelectNv(nvBuy, index)) {
+                sendMessage(new Message(4).sendUTF("Bạn chưa sở hữu nhân vật này."));
+                return;
+            }
+            nv = (byte) index;
+            sendMessage(new Message(69).sendInt(iddb).sendByte(nv));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        try (Connection conn = SqlConnectionManager.createConnection();
+             PreparedStatement stmt = conn.prepareStatement("UPDATE account SET nhanvat=? WHERE id=?")) {
+            stmt.setInt(1, nv + 1);
+            stmt.setInt(2, iddb);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     static int levelFromExpValue(int exp) {
         int level = 1;
         int remaining = exp;

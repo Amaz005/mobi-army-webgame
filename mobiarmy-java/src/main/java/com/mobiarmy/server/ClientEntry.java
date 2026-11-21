@@ -28,6 +28,8 @@ public class ClientEntry implements ISession {
 
     boolean connected;
     boolean login;
+    /** Username reserved by command 35 on this connection; the next login with it creates the account. */
+    private String pendingRegistration;
     private byte curR, curW;
     private AtomicInteger disposed = new AtomicInteger(0);
 
@@ -61,15 +63,7 @@ public class ClientEntry implements ISession {
         // We should set handler to a MessageHandler instance, wait for that class.
         setHandler(new MessageHandler(this));
 
-        loginTimer = new Timer();
-        loginTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (!login) {
-                    closeMessage();
-                }
-            }
-        }, LOGIN_TIMEOUT_MS);
+        startLoginTimer();
 
         collectorThread = new Thread(this::collectorLoop);
         collectorThread.setDaemon(true);
@@ -292,6 +286,21 @@ public class ClientEntry implements ISession {
             System.out.println("Client: " + id + " name: " + userS + " pass: " + pass + " version: " + version);
             this.versionARM = version;
 
+            if (pendingRegistration != null && pendingRegistration.equals(Registration.normalize(userS))) {
+                String name = pendingRegistration;
+                pendingRegistration = null;
+                if (!Registration.isValidPassword(pass)) {
+                    sendMessage(new Message(4).sendUTF("Mật khẩu chỉ gồm chữ và số, tối đa 50 ký tự."));
+                    return;
+                }
+                if (!Registration.create(name, pass)) {
+                    sendMessage(new Message(4).sendUTF("Tài khoản " + name + " đã tồn tại. Hãy chọn tên khác."));
+                    return;
+                }
+                System.out.println("Client: " + id + " registered account " + name);
+                userS = name;
+            }
+
             User us = User.login(this, userS, pass);
             if (us != null) {
                 System.out.println("Login Success!");
@@ -311,6 +320,49 @@ public class ClientEntry implements ISession {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /** Closes the connection if nobody logs in within LOGIN_TIMEOUT_MS; restarting it gives more time. */
+    private synchronized void startLoginTimer() {
+        if (loginTimer != null) loginTimer.cancel();
+        loginTimer = new Timer();
+        loginTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!login) {
+                    closeMessage();
+                }
+            }
+        }, LOGIN_TIMEOUT_MS);
+    }
+
+    /**
+     * Command 35 from the Register screen. The client sends only the username (the password went in
+     * the original game's SMS), so this reserves the name for this connection; the next login on this
+     * connection with that name creates the account with the password the player typed.
+     */
+    public void registerMessage(Message ms) {
+        if (login) return;
+        try {
+            String name = Registration.normalize(ms.readUTF());
+            if (!Registration.isValidUsername(name)) {
+                sendMessage(new Message(4).sendUTF("Tên tài khoản chỉ gồm chữ và số, tối đa 20 ký tự."));
+                return;
+            }
+            if (Registration.exists(name)) {
+                sendMessage(new Message(4).sendUTF("Tài khoản " + name + " đã tồn tại. Hãy chọn tên khác."));
+                return;
+            }
+            pendingRegistration = name;
+            startLoginTimer();
+            sendMessage(new Message(4).sendUTF("Tên " + name + " dùng được. Bấm Đăng nhập để hoàn tất đăng ký"
+                    + " với mật khẩu bạn vừa nhập (chỉ gồm chữ và số)."));
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                sendMessage(new Message(4).sendUTF("Đăng ký thất bại, vui lòng thử lại sau."));
+            } catch (Exception ignored) {}
         }
     }
 

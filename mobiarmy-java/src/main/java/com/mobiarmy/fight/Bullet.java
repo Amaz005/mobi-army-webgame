@@ -81,9 +81,7 @@ public class Bullet {
             if (target == null) continue;
 
             int tamAH = getTamAhByBulletId(bullId);
-            int kcX = Math.abs(target.x - x);
-            int kcY = Math.abs(target.y - target.height / 2 - y);
-            int kc = (int) Math.sqrt(kcX * kcX + kcY * kcY);
+            int kc = distanceTo(target);
 
             if (!target.isDie && target.voHinhCount <= 0 && kc <= tamAH + target.width / 2) {
                 try {
@@ -93,6 +91,31 @@ public class Bullet {
                 }
             }
         }
+    }
+
+    /** Distance from the blast centre to the middle of the target's body. */
+    private int distanceTo(Player target) {
+        int kcX = Math.abs(target.x - x);
+        int kcY = Math.abs(target.y - target.height / 2 - y);
+        return (int) Math.sqrt(kcX * kcX + kcY * kcY);
+    }
+
+    /**
+     * Damage at distance {@code kc}: full when the blast centre is within the target's body, then
+     * falling linearly to half at the edge of the blast radius.
+     */
+    static int damageAt(int satThuong, int kc, int tamAH, int halfWidth) {
+        int over = kc - halfWidth;
+        if (over <= 0) return satThuong;
+        if (over > tamAH || tamAH <= 0) return 0;
+        return satThuong - satThuong * over / (2 * tamAH);
+    }
+
+    /** Damages every player in the blast radius (the shooter included). */
+    protected void explode() {
+        if (satThuong <= 0) return;
+        int tamAH = getTamAhByBulletId(bullId);
+        applyAreaEffect(target -> target.updateHP(-damageAt(satThuong, distanceTo(target), tamAH, target.width / 2)));
     }
 
     public void nextXY() {
@@ -131,6 +154,7 @@ public class Bullet {
             }
             if (isCanCollision) {
                 fm.mapMNG.collision(x, y, this);
+                explode();
             }
             return;
         }
