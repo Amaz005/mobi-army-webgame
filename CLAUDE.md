@@ -62,6 +62,9 @@ docker run --rm -v "$PWD":/w -v mobiarmy-m2:/root/.m2 -w /w/web-client maven:3.9
 - In `@JSBody` scripts, `$`-prefix every local and inner-function parameter (TeaVM's minifier renames
   parameters but not locals, which caused real collisions).
 - `web.build.FixGameAction` patches the original client's self-recursive `el.getGameAction` at build time.
+- `web.build.MakeIcons` generates `favicon.ico` and the home-screen icons from `Army165local/icon.png`
+  at build time (integer nearest-neighbour scaling); generated icons are never committed. New
+  web paths must be added to the nginx allowlist in both `docker/web/nginx.*.conf.template`.
 
 Without Docker (run from `mobiarmy-java/`, because paths like `army2.conf` and `res/` are relative; needs
 JDK 17, Maven and a reachable PostgreSQL):

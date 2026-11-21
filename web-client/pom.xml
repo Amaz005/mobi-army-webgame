@@ -142,6 +142,21 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <executions>
+                    <!-- specs/003-web-icon: favicon + home-screen icons from the game's own icon.png. -->
+                    <execution>
+                        <id>make-icons</id>
+                        <!-- After compile (needs the MakeIcons class); webapp files were copied in process-resources. -->
+                        <phase>process-classes</phase>
+                        <goals><goal>java</goal></goals>
+                        <configuration>
+                            <mainClass>web.build.MakeIcons</mainClass>
+                            <arguments>
+                                <argument>${client.res}/icon.png</argument>
+                                <argument>${webapp.out}</argument>
+                            </arguments>
+                            <classpathScope>compile</classpathScope>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>fix-game-action</id>
                         <phase>process-classes</phase>

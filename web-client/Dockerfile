@@ -10,8 +10,9 @@ COPY web-client/src ./src
 # Compiles the MIDP web layer, runs the JUnit tests, fixes getGameAction in the original bytecode, runs TeaVM.
 RUN mvn -B -q package
 # FR-006: the page shell must not load anything from another site.
-RUN if grep -nE "(src|href)=[\"']?https?://|url\(['\"]?https?://|import .*https?://" \
-        target/webapp/index.html target/webapp/play.css target/webapp/keypad.js; then \
+RUN if grep -nE "(src|href)=[\"']?https?://|url\(['\"]?https?://|import .*https?://|\"(src|start_url)\"[[:space:]]*:[[:space:]]*\"https?://" \
+        target/webapp/index.html target/webapp/play.css target/webapp/keypad.js \
+        target/webapp/manifest.webmanifest; then \
       echo "off-site reference in page shell (FR-006)"; exit 1; fi
 
 FROM nginx:1.27-alpine

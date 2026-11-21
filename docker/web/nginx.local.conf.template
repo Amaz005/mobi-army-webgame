@@ -32,6 +32,17 @@ server {
         add_header Cache-Control "no-cache";
     }
 
+    # Icons (specs/003-web-icon): revalidated each visit, so a changed icon shows up after a release.
+    location ~ ^/(favicon\.ico|icon-192\.png|icon-512\.png|apple-touch-icon\.png)$ {
+        add_header Cache-Control "no-cache";
+    }
+
+    # nginx's mime.types has no entry for .webmanifest.
+    location = /manifest.webmanifest {
+        default_type application/manifest+json;
+        add_header Cache-Control "no-cache";
+    }
+
     # One WebSocket = one game session (contracts/web-endpoints.md › /game).
     location = /game {
         access_log /var/log/nginx/access.log game;
