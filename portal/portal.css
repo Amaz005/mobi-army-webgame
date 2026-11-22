@@ -453,3 +453,22 @@ body.playing { height: 100vh; overflow: hidden; }
   .bar { grid-template-columns: auto 1fr; }
   .bar .btn.danger { justify-self: start; }
 }
+
+/* Mouse hint on the play page (specs/005-mouse-control FR-012). */
+.mouse-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 70px;
+  z-index: 4;
+  transform: translateX(-50%);
+  width: min(460px, calc(100% - 32px));
+  padding: 12px 14px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  background: var(--side);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  font-size: 0.92rem;
+}
+
+.mouse-hint p { margin: 0 0 10px; }
+.keys-panel h2 + table + h2, .keys-panel table + h2 { margin-top: 12px; }

@@ -1,5 +1,8 @@
 # Contract: Key Mapping
 
+> Mouse controls (clicks, wheel, right click, desktop control pad) are in
+> `specs/005-mouse-control/contracts/mouse-mapping.md`.
+
 Browser input → key codes delivered to the game's `Canvas.keyPressed/keyReleased`. The README links
 to this table (FR-011). Implemented in `web-client/src/main/java/web/KeyMap.java` (tested by `KeyMapTest`).
 

@@ -18,6 +18,8 @@ public class Graphics {
     private int tx, ty;
     private int clipX, clipY, clipW, clipH;
     private int color;
+    /** Set on the screen graphics only: reports highlight bars to the mouse translator (spec 005). */
+    web.MouseControl bars;
     private String colorCss = "#000000";
 
     Graphics(JSObject ctx, int surfaceW, int surfaceH) {
@@ -106,6 +108,7 @@ public class Graphics {
     public void fillRect(int x, int y, int w, int h) {
         if (w <= 0 || h <= 0) return;
         fillRect(ctx, x + tx, y + ty, w, h);
+        if (bars != null) bars.barCandidate(x + tx, y + ty, w, h, color, clipX, clipY, clipW, clipH);
     }
 
     /** MIDP outlines cover (w+1)×(h+1) pixels. */

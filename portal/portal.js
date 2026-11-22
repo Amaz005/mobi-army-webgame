@@ -502,6 +502,38 @@
       if (document.fullscreenElement) document.exitFullscreen().then(focusGame, focusGame);
       else if (stage.requestFullscreen) stage.requestFullscreen().then(focusGame, focusGame);
     };
+
+    // Control pad (specs/005-mouse-control US3): the game page's keypad, switched live without a reload.
+    var padButton = $('#btn-pad');
+    function gameWindow() {
+      try { return frame.contentWindow && frame.contentWindow.mobiarmyKeypadShow ? frame.contentWindow : null; }
+      catch (e) { return null; }
+    }
+    function syncPad() {
+      var w = gameWindow();
+      padButton.hidden = !w;
+      padButton.setAttribute('aria-pressed', String(!!(w && w.mobiarmyKeypadShown())));
+    }
+    frame.addEventListener('load', syncPad);
+    padButton.onclick = function () {
+      var w = gameWindow();
+      if (!w) return;
+      w.mobiarmyKeypadShow(!w.mobiarmyKeypadShown());
+      syncPad();
+      focusGame();
+    };
+
+    // One-time hint that the mouse works (FR-012), on computers only.
+    var hint = $('#mouse-hint');
+    var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+    if (hint && finePointer && !store('portal.mouseHintSeen')) {
+      hint.hidden = false;
+      $('#mouse-hint-ok').onclick = function () {
+        store('portal.mouseHintSeen', '1');
+        hint.hidden = true;
+        focusGame();
+      };
+    }
   }
 
   function init() {
