@@ -283,7 +283,7 @@ public class ClientEntry implements ISession {
                 return;
             }
 
-            System.out.println("Client: " + id + " name: " + userS + " pass: " + pass + " version: " + version);
+            System.out.println("Client: " + id + " name: " + userS + " version: " + version);
             this.versionARM = version;
 
             if (pendingRegistration != null && pendingRegistration.equals(Registration.normalize(userS))) {

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cổng game – chơi game online miễn phí</title>
+  <meta name="description" content="Chơi game online miễn phí ngay trên trình duyệt, không cần tải app. Một tài khoản cho mọi trò chơi.">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/portal.css">
+</head>
+<body data-page="home">
+  <div class="layout">
+    <aside class="side">
+      <a class="brand" href="/"><img src="/icon-192.png" alt="" width="36" height="36"><span>Cổng game</span></a>
+      <nav class="menu" aria-label="Chính">
+        <a href="/" class="active"><span class="ico ico-play" aria-hidden="true"></span>Trò chơi</a>
+        <a href="/#huong-dan"><span class="ico ico-guide" aria-hidden="true"></span>Hướng dẫn</a>
+        <a href="/" data-ranking-link hidden><span class="ico ico-rank" aria-hidden="true"></span>Bảng xếp hạng</a>
+      </nav>
+      <div class="user" id="account" aria-label="Tài khoản"></div>
+    </aside>
+
+    <main>
+      <h1 class="headline">Vào trận <span>cùng bạn bè</span></h1>
+
+      <a id="featured" class="featured" href="/" hidden>
+        <img alt="" width="44" height="44">
+        <span class="featured-text"><strong></strong><small></small></span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+
+      <p id="status" role="status"></p>
+
+      <section>
+        <h2 class="section-title">Trò chơi</h2>
+        <ul id="games" class="cards"></ul>
+      </section>
+
+      <section id="huong-dan">
+        <h2 class="section-title">Hướng dẫn</h2>
+        <ol class="steps">
+          <li><strong>Tạo tài khoản</strong> trên cổng game (góc dưới bên trái, hoặc trên cùng nếu dùng điện thoại).</li>
+          <li><strong>Chọn trò chơi</strong> và bấm “Chơi ngay”. Không cần cài đặt gì.</li>
+          <li><strong>Đăng nhập trong game</strong> bằng đúng tên đăng nhập và mật khẩu đó.</li>
+        </ol>
+      </section>
+
+      <p class="online" id="online" hidden><span class="live"></span></p>
+    </main>
+  </div>
+
+  <script src="/portal.js" defer></script>
+</body>
+</html>

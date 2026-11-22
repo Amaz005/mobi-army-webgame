@@ -1,5 +1,9 @@
 # Contract: Web Endpoints
 
+> **Superseded for the URL layout by `specs/004-game-portal/contracts/web-endpoints.md`**: the portal
+> now serves `/`, and this client lives at `/mobiarmy/client/`, framed by the play page `/mobiarmy/choi/`
+> (old paths redirect). `/game` is unchanged.
+
 What browsers (and anyone on the internet, in public mode) can reach. The game protocol is not
 defined here; it passes through `/game` unchanged.
 

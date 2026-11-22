@@ -12,7 +12,7 @@ BEGIN;
 CREATE TABLE account (
   id INTEGER PRIMARY KEY,
   username VARCHAR(20) NOT NULL,
-  password VARCHAR(50) NOT NULL,
+  password VARCHAR(255) NOT NULL,
   xu INTEGER NOT NULL DEFAULT 1000,
   nvBuy VARCHAR(50) NOT NULL DEFAULT '[1, 1, 1, 0, 0, 0, 0, 0, 0]',
   online SMALLINT NOT NULL DEFAULT 0,
@@ -27,9 +27,13 @@ CREATE TABLE account (
 
 INSERT INTO account
 (id, username, password, xu, nvBuy, online, itembag, superadmin, banbe, nhanvat, exp, killdead, thongtin) VALUES
-(1, 'a', '1', 1000000, '[1, 1, 1, 0, 0, 0, 0, 0, 0]', 0, '[[0,99],[1,99],[2,99],[3,99],[4,99],[5,99],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0]]', 0, '[3]', 9, 0, '[0, 0]', '[]'),
-(2, 'a', '1', 1000000, '[1, 1, 1, 0, 0, 0, 0, 0, 0]', 0, '[[0,99],[1,99],[2,99],[3,99],[4,99],[5,99],[6,99],[7,99],[8,99],[9,99],[10,99],[11,99],[12,99],[13,99],[14,99],[15,99],[16,99],[17,99],[18,99],[19,99],[20,99],[21,99]]', 1, '[3]', 1, 50000, '[0, 0]', '[]'),
-(3, 'nguoiduatin', '3', 1000, '[1, 1, 1, 0, 0, 0, 0, 0, 0]', 0, '[[0,99],[1,99],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0]]', 1, '[3]', 1, 500000, '[0, 0]', '[]');
+(1, 'a', 'pbkdf2_sha256$600000$MMp+38A/zHHxshtOQv5IiQ==$y77VOppoeAvKqCs7Fi8RkGa/9BgRHjTnynYBweCulxU=', 1000000, '[1, 1, 1, 0, 0, 0, 0, 0, 0]', 0, '[[0,99],[1,99],[2,99],[3,99],[4,99],[5,99],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0]]', 0, '[3]', 9, 0, '[0, 0]', '[]'),
+(2, 'a2', 'pbkdf2_sha256$600000$rNM/qf7l1sLkL+QlXCErcQ==$EfA/4h6mUqQfJIgho9g3yGGxeaJMJRf9mugGaeS1Ygg=', 1000000, '[1, 1, 1, 0, 0, 0, 0, 0, 0]', 0, '[[0,99],[1,99],[2,99],[3,99],[4,99],[5,99],[6,99],[7,99],[8,99],[9,99],[10,99],[11,99],[12,99],[13,99],[14,99],[15,99],[16,99],[17,99],[18,99],[19,99],[20,99],[21,99]]', 1, '[3]', 1, 50000, '[0, 0]', '[]'),
+(3, 'nguoiduatin', 'pbkdf2_sha256$600000$VTvqpWeX+tTS+wmXx4geXw==$dpGukQEAl7q0xw8guNAXTJt0ojOP9qyO/phPxQswQY8=', 1000, '[1, 1, 1, 0, 0, 0, 0, 0, 0]', 0, '[[0,99],[1,99],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0],[19,0],[20,0],[21,0]]', 1, '[3]', 1, 500000, '[0, 0]', '[]');
+
+-- Login names are unique (specs/004-game-portal research D4). Passwords are stored only as PBKDF2
+-- hashes (server PasswordHash); the seed test accounts are listed in README.md.
+CREATE UNIQUE INDEX account_username_uq ON account (username);
 
 CREATE TABLE item (
   item_id SMALLINT PRIMARY KEY,

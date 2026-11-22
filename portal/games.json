@@ -1,0 +1,24 @@
+[
+  {
+    "id": "mobiarmy",
+    "name": "MobiArmy",
+    "description": "Bắn súng theo lượt: căn góc, chỉnh lực và hạ đối thủ cùng bạn bè.",
+    "tagline": "Miễn phí, chơi ngay trên trình duyệt, không cần tải app.",
+    "players": "2–8 người",
+    "image": "/icon-192.png",
+    "playUrl": "/mobiarmy/client/",
+    "howToPlay": [
+      {
+        "title": "Cách chơi",
+        "text": "Đăng nhập bằng tài khoản của cổng game, chọn phòng và vào trận. Mỗi lượt, di chuyển nhân vật, căn góc và giữ lực bắn để hạ đối thủ. Dùng vật phẩm đúng lúc để lật ngược thế trận."
+      },
+      {
+        "title": "Điều khiển",
+        "text": "Phím mũi tên: di chuyển và căn góc. Enter: bắn / chọn. F1 và F2 (hoặc Esc): hai phím mềm trái và phải. Trên điện thoại, dùng bàn phím ảo dưới màn hình."
+      }
+    ],
+    "order": 1,
+    "status": "visible",
+    "live": "mobiarmy"
+  }
+]

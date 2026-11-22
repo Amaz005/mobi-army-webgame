@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Cổng game</title>
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/portal.css">
+</head>
+<body data-page="play" class="playing">
+  <div class="layout">
+    <aside class="side">
+      <a class="brand" href="/"><img src="/icon-192.png" alt="" width="36" height="36"><span>Cổng game</span></a>
+      <nav class="menu" aria-label="Chính">
+        <a href="/" class="active"><span class="ico ico-play" aria-hidden="true"></span>Trò chơi</a>
+        <a href="/#huong-dan"><span class="ico ico-guide" aria-hidden="true"></span>Hướng dẫn</a>
+        <a href="/" data-ranking-link hidden><span class="ico ico-rank" aria-hidden="true"></span>Bảng xếp hạng</a>
+      </nav>
+      <div class="user" id="account" aria-label="Tài khoản"></div>
+    </aside>
+
+    <div class="stage">
+      <p id="status" role="status"></p>
+      <div class="stage-top">
+        <span class="chip live" data-live=""></span>
+      </div>
+      <iframe id="frame" title="Trò chơi" allow="fullscreen; autoplay" hidden></iframe>
+
+      <div id="keys" class="keys-panel" hidden>
+        <h2>Phím điều khiển</h2>
+        <table>
+          <tbody>
+            <tr><td>Mũi tên</td><td>Di chuyển, căn góc, chọn mục</td></tr>
+            <tr><td>Enter</td><td>Bắn / đồng ý (giữ để tăng lực)</td></tr>
+            <tr><td>F1</td><td>Phím mềm trái</td></tr>
+            <tr><td>F2 hoặc Esc</td><td>Phím mềm phải</td></tr>
+            <tr><td>Backspace</td><td>Xoá chữ</td></tr>
+          </tbody>
+        </table>
+        <p class="hint">Trên điện thoại, dùng bàn phím ảo dưới màn hình game.</p>
+      </div>
+
+      <div class="bar">
+        <span class="bar-title" id="p-name"></span>
+        <a id="leave" class="btn danger" href="/">Rời game</a>
+        <span class="bar-tools">
+          <button type="button" class="tool" id="btn-keys" aria-pressed="false" title="Phím điều khiển">⌨</button>
+          <button type="button" class="tool" id="btn-full" title="Toàn màn hình">⛶</button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/portal.js" defer></script>
+</body>
+</html>

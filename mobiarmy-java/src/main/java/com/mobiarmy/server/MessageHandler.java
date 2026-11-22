@@ -157,7 +157,7 @@ public final class MessageHandler implements IMessageHandler {
                     // if (waiting() || waitFight()) client.user.buyItemMessage(mss);
                     break;
                 case 74:
-                    // if (waiting() || waitFight()) client.user.buyNvMessage(mss);
+                    if (waiting() || waitFight()) client.user.buyNvMessage(mss);
                     break;
                 case 75:
                     if (waitFight()) client.user.getFightWait().setMapMessage(client.user, mss);

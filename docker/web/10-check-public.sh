@@ -13,3 +13,9 @@ if [ "${WEB_MODE:-local}" = "public" ]; then
     fi
   done
 fi
+# Portal pages must not load anything from another site (specs/004-game-portal FR-012).
+if [ "${WEB_MODE:-local}" = "public" ] && grep -nE "(src|href)=[\"']?https?://|url\(['\"]?https?://" \
+    /usr/share/nginx/portal/*.html /usr/share/nginx/portal/*.css /usr/share/nginx/portal/*.js 2>/dev/null; then
+  echo "portal/ references another site (FR-012); fix it before going public" >&2
+  exit 1
+fi

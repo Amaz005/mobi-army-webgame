@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="play.css">
 </head>
 <body>
+  <a id="home" href="/">← Cổng game</a>
+  <script>if (window.top !== window.self) document.getElementById('home').hidden = true; /* inside the portal play page */</script>
   <main id="app">
     <canvas id="screen" width="240" height="320" tabindex="0" aria-label="Game screen"></canvas>
     <p id="status" role="status"></p>
