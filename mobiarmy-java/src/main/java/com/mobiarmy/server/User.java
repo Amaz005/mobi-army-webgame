@@ -431,8 +431,7 @@ public class User {
                 try (java.sql.ResultSet row = stmt.executeQuery()) {
                     String storedPass = null;
                     if (row.next()) storedPass = row.getString("password");
-                    if (storedPass != null && Accounts.checkPassword(storedPass, pass)) {
-                        Accounts.rehashIfLegacy(row.getInt("id"), storedPass, pass);
+                    if (storedPass != null && Accounts.checkLogin(row.getInt("id"), storedPass, pass)) {
                         us = new User(cl);
                         us.iddb = row.getInt("id");
                         us.username = row.getString("username");

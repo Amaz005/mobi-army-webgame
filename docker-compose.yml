@@ -36,6 +36,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env (see .env.example)}
       # Portal session cookie gets "Secure" (set true when players use HTTPS: public mode or the tunnel).
       PORTAL_SECURE_COOKIE: ${PORTAL_SECURE_COOKIE:-false}
+      # Signs portal logins (JWT); keep it stable so logins survive restarts. Unset: random per start.
+      PORTAL_JWT_SECRET: ${PORTAL_JWT_SECRET:-}
     ports:
       - "${GAME_PORT:-19149}:19149"
     # Portal API (specs/004-game-portal): reachable by the web container only, never published.

@@ -219,3 +219,59 @@ Findings from the current code (2026-11-22) and the decisions they lead to.
   those live inside the fixed client and its protocol, so the portal can't show them (constitution I).
 - **Home-screen installs** made from the client manifest (`/mobiarmy/client/`) open the bare client
   in full screen, which suits phones.
+
+### D15. Skip the in-game login when already logged in on the portal (user request, 2026-11-22)
+
+- **Problem**: the portal never knows the real password (it stores only hashes), and the client and
+  its protocol are fixed.
+- **Decision**: a one-time **game ticket**.
+  1. **Issue**: `POST /api/mobiarmy/ticket` with a portal session returns `{username, ticket}`. The
+     ticket is 24 letters/digits, valid 2 minutes, bound to the account, in server memory
+     (`server/GameTickets`).
+  2. **Fetch**: the client page shell `/mobiarmy/client/` asks for a ticket before starting the game
+     (waits at most 3 s) and leaves it in `window.mobiarmyAutoLogin`.
+  3. **Use**: a build-time patch `web.build.AutoLoginPatch` (ASM, like `FixGameAction`, original
+     bytecode untouched) rewrites the login screen `coreLG.dl.d()`. While a ticket is pending it:
+     - answers "Bật âm thanh?" with "Bật", keeping the saved volume;
+     - fast-forwards the intro, like "Qua nhanh";
+     - then fills the name and ticket fields and calls `g()`, the "Đăng nhập" action.
+  4. **Accept**: the normal login message (command 1) carries the ticket as the password.
+     `Accounts.checkLogin` accepts the password **or** a valid ticket for that account, and consumes
+     the ticket.
+  5. **Don't remember it**: the client remembers the last password in RMS `caropass`; the web layer's
+     `RecordStore` refuses to store the ticket there (`web.AutoLogin.isTicket`).
+- **Properties**:
+  - The wire protocol is unchanged (constitution I).
+  - A ticket never becomes the stored password and never triggers a re-hash.
+  - Not logged in on the portal → 401 → the usual login screen.
+  - After logging out in-game the ticket is used up, so the player can log in by hand as another
+    account.
+  - Phone clients are unaffected.
+- **Alternatives rejected**:
+  - Sending the real password to the client: the portal doesn't have it.
+  - Simulating key presses on a timer: the login screen's state can't be seen from outside, so this
+    is fragile.
+  - A new protocol command: needs a client change.
+
+### D16. Portal sessions as JWT (user request, 2026-11-22)
+
+- **Problem**: sessions in server memory (D6) ended on every server restart or deploy.
+- **Decision**: the session cookie holds a signed JWT, HS256 with `PORTAL_JWT_SECRET` from `.env`
+  (`portal/PortalTokens`). It is built on the JDK's HMAC and Jackson, so no new dependency. The
+  header must match exactly, so `alg: none` and algorithm switching are rejected.
+- **Timeouts**:
+  - Idle: `exp` = issue time + `portal-session-idle-minutes`. A token older than 5 minutes is
+    re-issued in a response cookie, so active players stay logged in.
+  - Absolute: 7 days after the login (`auth`).
+- **Revocation without server state**:
+  - Password change: `pv`, an HMAC fingerprint of the stored password hash, is checked against the
+    database on every use. Changing the password therefore ends every other session, and the current
+    session gets a new cookie in the response.
+  - Log-out: the cookie is cleared and the `jti` is denied in memory until `exp`.
+- **Missing or short secret**: a random key is used for this run only, with a startup warning, so the
+  old behaviour returns. The secret is never logged or committed (constitution IV).
+- **Unchanged**: game tickets (D15) and login throttles stay in memory. They are short-lived, so a
+  restart only costs an in-flight ticket.
+- **Alternatives rejected**:
+  - Storing sessions in PostgreSQL: a new table and migration, plus writes on every request.
+  - A JWT library (jjwt, nimbus): a new dependency for about 150 lines of code.

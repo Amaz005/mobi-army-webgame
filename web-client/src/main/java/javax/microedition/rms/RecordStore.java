@@ -3,6 +3,7 @@ package javax.microedition.rms;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import web.AutoLogin;
 import web.Js;
 import web.RecordStoreCodec;
 
@@ -62,14 +63,18 @@ public class RecordStore {
 
     public int addRecord(byte[] data, int offset, int numBytes) throws RecordStoreException {
         checkOpen();
-        records.add(copy(data, offset, numBytes));
+        byte[] r = copy(data, offset, numBytes);
+        // A one-time portal ticket must not be remembered as the password (web.AutoLogin).
+        records.add(AutoLogin.isTicket(name, r) ? new byte[0] : r);
         save();
         return records.size();
     }
 
     public void setRecord(int recordId, byte[] newData, int offset, int numBytes) throws RecordStoreException {
         checkId(recordId);
-        records.set(recordId - 1, copy(newData, offset, numBytes));
+        byte[] r = copy(newData, offset, numBytes);
+        if (AutoLogin.isTicket(name, r)) return; // keep the remembered password (web.AutoLogin)
+        records.set(recordId - 1, r);
         save();
     }
 

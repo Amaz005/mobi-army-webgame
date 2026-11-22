@@ -241,6 +241,9 @@ ranking lists seeded accounts in order of experience.
 - **FR-020**: New accounts MUST start with the same in-game starting state as accounts created
   any other way today (starting character, currency, experience); the portal MUST NOT let anyone
   set those values.
+- **FR-021**: A player logged in on the portal MUST reach the MobiArmy main menu from the play page
+  without the game asking for the name and password again. This MUST NOT reveal or store the real
+  password, or change what the game sends over the network (research D15).
 
 ### Key Entities
 
