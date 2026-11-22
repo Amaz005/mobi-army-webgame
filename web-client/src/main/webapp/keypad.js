@@ -1,11 +1,28 @@
-// On-screen phone keypad for touch devices (spec US4, contracts/key-mapping.md).
-// Shown when the device's main pointer is coarse (touch), or with ?keypad=1. Sends MIDP key codes
-// through window.mobiarmyKeypad(type, code), which the game installs when it starts.
+// On-screen phone keypad (002 spec US4, contracts/key-mapping.md), also the mouse "control pad" on desktop
+// (specs/005-mouse-control US3). Sends MIDP key codes through window.mobiarmyKeypad(type, code), which the
+// game installs when it starts.
+//
+// Shown by default on touch devices. ?keypad=1 / ?keypad=0 force it; otherwise the player's choice from the
+// portal toggle (localStorage "mobiarmy.keypad" = on/off) wins. window.mobiarmyKeypadShow(on) and
+// window.mobiarmyKeypadShown() let the portal play page switch it live, without reloading the game.
 (function () {
+  var STORE = 'mobiarmy.keypad';
   var params = new URLSearchParams(location.search);
-  var wanted = params.get('keypad') === '1' ||
-    (params.get('keypad') !== '0' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-  if (!wanted) return;
+
+  function stored() {
+    try { return localStorage.getItem(STORE); } catch (e) { return null; }
+  }
+
+  function remember(on) {
+    try { localStorage.setItem(STORE, on ? 'on' : 'off'); } catch (e) { /* storage blocked: not remembered */ }
+  }
+
+  var initial;
+  if (params.get('keypad') === '1') initial = true;
+  else if (params.get('keypad') === '0') initial = false;
+  else if (stored() === 'on') initial = true;
+  else if (stored() === 'off') initial = false;
+  else initial = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 
   // [label, MIDP code, css class]
   var rows = [
@@ -19,6 +36,7 @@
   ];
 
   var pad = document.getElementById('keypad');
+  var stops = [];
   rows.forEach(function (row) {
     row.forEach(function (k) {
       var b = document.createElement('button');
@@ -26,12 +44,10 @@
       b.textContent = k[0];
       b.className = 'key ' + (k[2] || 'digit');
       if (k[2] === 'gap') { b.disabled = true; b.setAttribute('aria-hidden', 'true'); }
-      else { bind(b, k[1]); b.setAttribute('aria-label', label(k)); }
+      else { stops.push(bind(b, k[1])); b.setAttribute('aria-label', label(k)); }
       pad.appendChild(b);
     });
   });
-  pad.hidden = false;
-  document.body.classList.add('with-keypad');
 
   function label(k) {
     if (k[1] === -6) return 'Left soft key';
@@ -53,17 +69,47 @@
       send('up', code);
     }
     button.addEventListener('pointerdown', function (e) {
+      if (e.button !== undefined && e.button !== 0) return;
       e.preventDefault();
       button.setPointerCapture(e.pointerId);
       button.classList.add('active');
       send('down', code);
-      // Like a held phone key: repeat after a short delay.
+      // Like a held phone key: repeat after a short delay (the fire key builds power while held).
       delay = setTimeout(function () {
         repeat = setInterval(function () { send('repeat', code); }, 120);
       }, 400);
     });
     button.addEventListener('pointerup', stop);
     button.addEventListener('pointercancel', stop);
+    button.addEventListener('lostpointercapture', stop);
     button.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    return stop;
   }
+
+  // Nothing may stay held when the window loses focus or the tab is hidden (spec 005 FR-008).
+  function releaseAll() {
+    stops.forEach(function (stop) { stop(); });
+  }
+  window.addEventListener('blur', releaseAll);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) releaseAll(); });
+
+  function show(on) {
+    if (!on) {
+      releaseAll();
+      if (window.mobiarmyReleaseAll) window.mobiarmyReleaseAll();
+    }
+    pad.hidden = !on;
+    document.body.classList.toggle('with-keypad', on);
+  }
+
+  window.mobiarmyKeypadShow = function (on) {
+    on = !!on;
+    show(on);
+    remember(on);
+    var screen = document.getElementById('screen');
+    if (screen) screen.focus();
+  };
+  window.mobiarmyKeypadShown = function () { return !pad.hidden; };
+
+  show(initial);
 })();

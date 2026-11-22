@@ -68,6 +68,10 @@ docker run --rm -v "$PWD":/w -v mobiarmy-m2:/root/.m2 -w /w/web-client maven:3.9
 - In `@JSBody` scripts, `$`-prefix every local and inner-function parameter (TeaVM's minifier renames
   parameters but not locals, which caused real collisions).
 - `web.build.FixGameAction` patches the original client's self-recursive `el.getGameAction` at build time.
+- `web.MouseControl` (spec 005) turns mouse clicks into phone keys: the bottom soft-key bar, and list rows by
+  following the game's own highlight bar (the screen `Graphics` reports highlight `fillRect`s; `Canvas` asks
+  for a key each frame). Keys from paint go straight to `Display` (posting to `EventQueue` from a running
+  Java thread breaks TeaVM). `keypad.js` exposes `mobiarmyKeypadShow/Shown` for the play page's pad toggle.
 - `web.build.AutoLoginPatch` patches the login screen `coreLG.dl.d()` at build time: with a portal ticket
   (`web.AutoLogin`, fetched by the page shell) it answers the sound question, skips the intro and logs in.
 - `web.build.MakeIcons` generates `favicon.ico` and the home-screen icons from `Army165local/icon.png`

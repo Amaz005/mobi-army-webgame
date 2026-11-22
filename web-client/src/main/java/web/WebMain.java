@@ -17,6 +17,8 @@ public final class WebMain {
 
         int w = intParam("w", 240), h = intParam("h", 320);
         Display.initScreen("screen", w, h);
+        // Spec 005: the game's soft-key bar is ds.ab px high (font height + 6); clicks there are soft keys.
+        Display.setSoftBarHeight(() -> coreLG.ds.ab);
 
         // The client connects to TerrainMidlet.d:c. The socket layer always uses this site's relay anyway.
         coreLG.TerrainMidlet.d = Js.host();

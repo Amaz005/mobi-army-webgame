@@ -75,6 +75,8 @@ public abstract class Canvas extends Displayable {
         Graphics g = Display.screenGraphics();
         g.reset();
         paint(g);
+        // Spec 005: the mouse translator may step through a list now that this frame's bar is known.
+        if (g.bars != null) Display.tap(g.bars.frameEnd());
     }
 
     @Override

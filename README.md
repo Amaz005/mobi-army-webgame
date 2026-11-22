@@ -89,6 +89,10 @@ The MobiArmy page runs the original client and connects to this server; nothing 
 - **Keys:** arrows to move/aim, **Enter** to fire/OK (hold to charge power), **F1** and **F2**/**Esc**
   for the left and right soft keys. Type usernames, passwords and chat directly; **Backspace** deletes.
   Full table: [contracts/key-mapping.md](specs/002-web-client/contracts/key-mapping.md).
+- **Mouse** (spec 005): click a menu entry or list row to open it; click the bottom line of the game for its
+  left / middle / right soft key; wheel scrolls lists; right click goes back. The 🎮 button on the play page
+  shows a clickable pad (for matches, the shop, character select). Full table:
+  [contracts/mouse-mapping.md](specs/005-mouse-control/contracts/mouse-mapping.md).
 - **Touch screens** get an on-screen keypad automatically (`?keypad=1` forces it on, `?keypad=0` off).
 - Background music is off in the browser; sound effects play after the first key press or tap.
 

@@ -63,6 +63,15 @@ html, body {
   font: 600 16px/1 system-ui, sans-serif;
 }
 
+/* Desktop control pad (specs/005-mouse-control US3): on wide landscape screens it sits beside the game. */
+@media (min-width: 700px) and (orientation: landscape) {
+  .with-keypad #app { flex-direction: row; }
+  .with-keypad #screen { width: min(calc(100vw - 32px - 252px), calc((100vh - 24px) * 0.75), 720px); }
+  .with-keypad #keypad:not([hidden]) { width: 240px; }
+  .key { cursor: pointer; }
+  .key:hover { filter: brightness(1.2); }
+}
+
 .key.active { background: var(--key-active); }
 .key.soft { background: #1d4e9a; }
 .key.fire { background: #b8860b; }

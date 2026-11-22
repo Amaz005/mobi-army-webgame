@@ -39,13 +39,30 @@
             <tr><td>Backspace</td><td>Xoá chữ</td></tr>
           </tbody>
         </table>
+        <h2>Chuột</h2>
+        <table>
+          <tbody>
+            <tr><td>Bấm vào mục</td><td>Chọn và mở mục đó (menu, danh sách phòng, khu vực…)</td></tr>
+            <tr><td>Bấm dòng dưới cùng</td><td>Trái / giữa / phải = phím mềm trái / Chọn / phím mềm phải</td></tr>
+            <tr><td>Con lăn</td><td>Lên / xuống trong danh sách</td></tr>
+            <tr><td>Chuột phải</td><td>Quay lại (phím mềm phải)</td></tr>
+            <tr><td>🎮</td><td>Bàn phím ảo bấm bằng chuột: dùng trong trận, cửa hàng, chọn nhân vật</td></tr>
+          </tbody>
+        </table>
         <p class="hint">Trên điện thoại, dùng bàn phím ảo dưới màn hình game.</p>
+      </div>
+
+      <div id="mouse-hint" class="mouse-hint" role="note" hidden>
+        <p><strong>Dùng chuột được:</strong> bấm vào mục để chọn, bấm dòng chữ dưới cùng để Chọn / Thoát, chuột phải
+          để quay lại. Trong trận, bật <strong>🎮 Bàn phím ảo</strong> ở góc dưới bên phải.</p>
+        <button type="button" class="btn-small" id="mouse-hint-ok">Đã hiểu</button>
       </div>
 
       <div class="bar">
         <span class="bar-title" id="p-name"></span>
         <a id="leave" class="btn danger" href="/">Rời game</a>
         <span class="bar-tools">
+          <button type="button" class="tool" id="btn-pad" aria-pressed="false" title="Bàn phím ảo (bấm bằng chuột)">🎮</button>
           <button type="button" class="tool" id="btn-keys" aria-pressed="false" title="Phím điều khiển">⌨</button>
           <button type="button" class="tool" id="btn-full" title="Toàn màn hình">⛶</button>
         </span>

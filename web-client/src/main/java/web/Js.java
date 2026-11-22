@@ -100,13 +100,30 @@ public final class Js {
             + " return [Math.floor(($p.clientX - $r.left) * canvas.width / $r.width), Math.floor(($p.clientY - $r.top) * canvas.height / $r.height)]; }"
             + "var $down = false;"
             + "function $send($t, $e) { var $q = $pos($e); cb($t, $q[0], $q[1]); }"
-            + "canvas.addEventListener('mousedown', function($e) { $down = true; $send('pressed', $e); });"
+            // Spec 005: left button as before; right button = 'right' (no context menu); wheel; leave/blur/hide.
+            + "canvas.addEventListener('mousedown', function($e) {"
+            + "  if ($e.button === 2) { $e.preventDefault(); $send('right', $e); return; }"
+            + "  if ($e.button !== 0) return;"
+            + "  $down = true; $send('pressed', $e); });"
+            + "canvas.addEventListener('contextmenu', function($e) { $e.preventDefault(); });"
+            + "canvas.addEventListener('wheel', function($e) { $e.preventDefault();"
+            + "  cb('wheel', $e.deltaY > 0 ? 1 : ($e.deltaY < 0 ? -1 : 0), 0); }, {passive: false});"
+            + "canvas.addEventListener('mouseleave', function() { cb('leave', 0, 0); });"
+            + "window.addEventListener('blur', function() { cb('blur', 0, 0); });"
+            + "document.addEventListener('visibilitychange', function() { if (document.hidden) cb('blur', 0, 0); });"
             + "window.addEventListener('mousemove', function($e) { if ($down) $send('dragged', $e); });"
-            + "window.addEventListener('mouseup', function($e) { if ($down) { $down = false; $send('released', $e); } });"
+            + "window.addEventListener('mouseup', function($e) { if ($down && $e.button === 0) { $down = false; $send('released', $e); } });"
             + "canvas.addEventListener('touchstart', function($e) { $e.preventDefault(); $send('pressed', $e); }, {passive: false});"
             + "canvas.addEventListener('touchmove', function($e) { $e.preventDefault(); $send('dragged', $e); }, {passive: false});"
             + "canvas.addEventListener('touchend', function($e) { $e.preventDefault(); $send('released', $e); }, {passive: false});")
     public static native void listenPointer(JSObject canvas, PointerCallback cb);
+
+    /** Lets keypad.js release every held key when the pad hides (spec 005 FR-008). */
+    @JSBody(params = {"cb"}, script = "window.mobiarmyReleaseAll = function() { cb(); };")
+    public static native void exposeReleaseAll(Callback cb);
+
+    @JSBody(script = "return Date.now();")
+    public static native double now();
 
     // ---- storage --------------------------------------------------------------------------------
 
