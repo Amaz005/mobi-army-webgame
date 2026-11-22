@@ -1,5 +1,5 @@
 # One-command local stack: `docker compose up -d --build` (see README.md).
-# Secrets come from .env (copy .env.example). The database is not published to the host.
+# Secrets come from .env (copy .env.example). The database is published on 127.0.0.1 only.
 
 services:
   db:
@@ -13,6 +13,9 @@ services:
       # Init scripts run only when pgdata is empty (first start or after `down -v`).
       - ./mobiarmy-java/dbarmy.sql:/docker-entrypoint-initdb.d/01-dbarmy.sql:ro
       - ./docker/db/02-game-user.sh:/docker-entrypoint-initdb.d/02-game-user.sh:ro
+    ports:
+      # This machine only (DB tools like psql/DBeaver); not reachable from the LAN or the internet.
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     healthcheck:
       # TCP check: stays unhealthy during first-run init (which listens on the socket only).
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d dbarmy"]
@@ -31,8 +34,13 @@ services:
       DB_USER: army
       DB_DATABASE: dbarmy
       DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env (see .env.example)}
+      # Portal session cookie gets "Secure" (set true when players use HTTPS: public mode or the tunnel).
+      PORTAL_SECURE_COOKIE: ${PORTAL_SECURE_COOKIE:-false}
     ports:
       - "${GAME_PORT:-19149}:19149"
+    # Portal API (specs/004-game-portal): reachable by the web container only, never published.
+    expose:
+      - "8081"
     volumes:
       # Game settings: edit, then `docker compose restart server` (no rebuild).
       - ./mobiarmy-java/army2.conf:/app/army2.conf:ro
@@ -59,6 +67,7 @@ services:
       WEB_DOMAIN: ${WEB_DOMAIN:-}
       WEB_MAX_CONN_PER_IP: ${WEB_MAX_CONN_PER_IP:-4}
       WEB_CONN_RATE: ${WEB_CONN_RATE:-10r/m}
+      WEB_API_RATE: ${WEB_API_RATE:-30r/m}
     ports:
       - "${WEB_PORT:-8080}:8080"        # HTTP (local mode: the game; public mode: redirect + ACME)
       - "${WEB_TLS_PORT:-8443}:8443"    # HTTPS, public mode only
@@ -66,6 +75,8 @@ services:
       - ./docker/web/nginx.${WEB_MODE:-local}.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./docker/web/certs:/etc/nginx/certs:ro
       - ./docker/web/acme:/var/www/acme:ro
+      # Game portal (specs/004-game-portal): edit portal/games.json, then `docker compose restart web`.
+      - ./portal:/usr/share/nginx/portal:ro
     networks:
       default: {}
       tunnel:

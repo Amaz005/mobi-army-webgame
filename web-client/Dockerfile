@@ -16,6 +16,6 @@ RUN if grep -nE "(src|href)=[\"']?https?://|url\(['\"]?https?://|import .*https?
       echo "off-site reference in page shell (FR-006)"; exit 1; fi
 
 FROM nginx:1.27-alpine
-COPY --from=build /src/web-client/target/webapp /usr/share/nginx/html
+COPY --from=build /src/web-client/target/webapp /usr/share/nginx/html/mobiarmy/client
 COPY docker/web/10-check-public.sh /docker-entrypoint.d/10-check-public.sh
 RUN chmod +x /docker-entrypoint.d/10-check-public.sh

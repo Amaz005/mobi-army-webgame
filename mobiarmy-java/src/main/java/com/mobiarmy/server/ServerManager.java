@@ -50,6 +50,9 @@ public class ServerManager {
     static int maxRuongItemSlot;
     static int maxItem;
     static int maxFriends;
+    public static int portalPort;
+    public static int portalSessionIdleMinutes;
+    public static boolean portalSecureCookie;
 
     static int numClients;
     static List<ClientEntry> clients;
@@ -198,6 +201,11 @@ public class ServerManager {
             maxRuongItemSlot = configInt(cfg, "max-ruong-itemslot", 30000);
             maxItem = configInt(cfg, "max-item", 99);
             maxFriends = configInt(cfg, "max-friends", 60);
+            portalPort = configInt(cfg, "portal-port", 8081);
+            portalSessionIdleMinutes = configInt(cfg, "portal-session-idle-minutes", 30);
+            portalSecureCookie = System.getenv("PORTAL_SECURE_COOKIE") != null
+                    ? Boolean.parseBoolean(System.getenv("PORTAL_SECURE_COOKIE"))
+                    : configBool(cfg, "portal-secure-cookie", false);
             mgtBullNew = configBool(cfg, "mgt-bull-new", true);
             superAdmin = configBool(cfg, "super-admin", true);
             if (superAdmin) {
@@ -237,6 +245,16 @@ public class ServerManager {
             }
         }
         return result.toArray(new User[0]);
+    }
+
+    /** Players logged in right now (portal live info, data-model.md › Live game status.online). */
+    public static int onlineCount() {
+        if (clients == null) return 0;
+        int n = 0;
+        for (ClientEntry cl : clients) {
+            if (cl != null && cl.login) n++;
+        }
+        return n;
     }
 
     public static User getUser(int iddb) {

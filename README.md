@@ -29,11 +29,27 @@ Later changes to that file are not applied automatically. Apply them by hand in 
 
 **Ports:** the game port `19149` (phone clients) and the web client (`8080`, plus `8443` in public
 mode) are published; set `GAME_PORT` / `WEB_PORT` / `WEB_TLS_PORT` in `.env` if they're taken. The
-database and the relay are reachable only inside the stack.
+relay is reachable only inside the stack.
 
-Seeded test accounts: `nguoiduatin` / `3`, and `a` / `1`.
+**Database from this machine:** PostgreSQL is published on `127.0.0.1:5432` only (not the LAN or
+internet; change with `DB_PORT` in `.env`). Connect with any client (psql, DBeaver, pgAdmin…) to
+host `localhost`, database `dbarmy`, user `army` with `DB_PASSWORD` (the game's own role), or
+`postgres` with `POSTGRES_PASSWORD` (admin).
 
-**New accounts:** on the login screen, type a username (letters and digits, up to 20) and a password
+Seeded test accounts: `a` / `1`, `a2` / `1` (superadmin) and `nguoiduatin` / `3` (superadmin).
+Passwords are stored only as salted PBKDF2 hashes.
+
+**Upgrading a stack created before the game portal (spec 004)** — fresh stacks skip this. Login names
+become unique (duplicates are renamed `<name><id>`; the script lists them) and plaintext passwords are
+hashed. Until you do this, portal registration fails and the server logs a warning at startup.
+```
+docker compose exec -T db pg_dump -U postgres -d dbarmy -Fc > before-004.dump    # backup first; never commit it
+docker compose exec -T db psql -U postgres -d dbarmy -v ON_ERROR_STOP=1 < mobiarmy-java/sql/migrations/004-portal-accounts.sql
+docker compose up -d --build server
+docker compose exec server java -cp "classes:lib/*" com.mobiarmy.server.HashPasswords
+```
+
+**New accounts:** register on the portal (see below), or in the game: on the login screen, type a username (letters and digits, up to 20) and a password
 (letters and digits, up to 50), then **Menu → Đăng ký** and retype the password. When the server
 says the name is free, press **OK**, then **Đăng nhập**: that login creates the account with the
 password you typed. (The original client sends only the username when registering; the password went
@@ -46,7 +62,25 @@ The full command and settings contract is in
 ## Play in a browser
 
 Open **http://localhost:8080** (or `http://<this machine's IP>:8080` from another device on the LAN).
-Nothing to install: the page runs the original MobiArmy client and connects to this server.
+That's the **game portal** (spec 004): game cards, a page per game, and one account for every game.
+
+- `/` home page · `/mobiarmy/` MobiArmy page (how to play, ranking, online count) ·
+  `/mobiarmy/choi/` play page (the game inside the portal, with "Rời game", key help and full screen) ·
+  `/mobiarmy/client/` the bare game client. Old links (`/index.html`, …) redirect to the play page.
+- **Đăng ký / Đăng nhập** in the top right: login name 3–20 lowercase letters or digits, password
+  6–50 letters or digits. The same name and password log in to MobiArmy (browser and phone).
+  Existing MobiArmy accounts log in to the portal as they are. Forgotten passwords are reset by the
+  operator (no e-mail is collected).
+- Per-visitor limit on the portal API: `WEB_API_RATE` (default 30 requests/minute; login and
+  registration also lock after repeated failures). When players use HTTPS (public mode or the
+  tunnel), set `PORTAL_SECURE_COOKIE=true` in `.env`.
+
+**Add a game to the portal:** put its files in `portal/games/<id>/` (served at `/games/<id>/…`), add an
+entry to `portal/games.json`, then `docker compose restart web`. Set `"status"` to `maintenance` or
+`hidden` to take a game offline. Fields and rules:
+[contracts/game-catalog.md](specs/004-game-portal/contracts/game-catalog.md).
+
+The MobiArmy page runs the original client and connects to this server; nothing to install.
 
 - **Supported browsers:** current Chrome, Edge and Firefox on a computer; Chrome on Android. Other
   browsers get a message instead of a blank page.

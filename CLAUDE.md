@@ -12,11 +12,12 @@ fixed; the server must speak its protocol exactly. Governing rules live in
 | `Client/SOURCE_ARMYI/` | Decompiled client source — handy for reading the protocol, but **lossy** (JD-Core dropped code, e.g. `model/y.java`); confirm against bytecode. |
 | `Army165local/` | **Original** J2ME client bytecode + resources (`coreLG.TerrainMidlet`) — never edit; the web client compiles it. |
 | `web-client/` | Browser build of the original client: TeaVM + thin MIDP web layer (`javax/microedition/*`, `web/*`). |
+| `portal/` | Game portal (spec 004): static home page, shared game page `game.html`, `games.json` catalog; bind-mounted read-only into `web` (edit, then `docker compose restart web`). |
 | `docker/relay/`, `docker/web/` | WebSocket→TCP relay (fixed target `server:19149`) and nginx configs (local/public). Optional `cloudflared` compose service (profile `tunnel`); nginx trusts `CF-Connecting-IP` only from its fixed IP 172.29.252.2. |
 | `Army165sv.jar` | Prebuilt legacy server jar — reference only. |
 | `mobiarmy-java/dbarmy.sql` | **Canonical** PostgreSQL schema + seed data (also loads into SQLite). |
 | `mobiarmy.sql` | Old MySQL dump (different schema) — reference only. |
-| `mobiarmy-java/sql/` | DB admin scripts (e.g. `create_game_user.sql`). |
+| `mobiarmy-java/sql/` | DB admin scripts (e.g. `create_game_user.sql`) and ordered migrations in `sql/migrations/` (run after a `pg_dump`). |
 | `data/`, `player_data/`, `*.log` | Runtime data and logs — never hand-edit or commit. |
 
 Inside `mobiarmy-java/src/main/java/com/mobiarmy/`:
@@ -25,6 +26,9 @@ Inside `mobiarmy-java/src/main/java/com/mobiarmy/`:
 - `network/` — `Message`, `ISession`, `IMessageHandler` (framing / session contracts)
 - `fight/` — fight engine: `FightManager`, `Bullet`/`BulletManager`, `Boss`/`SuperBoss`, maps
 - `data/` — static game data (`ItemData`, `MapData`, `NVData`, …) and `SqlConnectionManager`
+- `portal/` — web portal JSON API on the JDK HTTP server (`PortalServer`, internal port `portal-port` 8081,
+  nginx proxies `/api/`), `PortalSessions`, `LoginThrottle`, `Ranking`. Accounts: `server/Accounts`,
+  `Registration`, `PasswordHash` (PBKDF2; game login and portal share them), `HashPasswords` (migration tool)
 
 ## Tech Stack
 - Java 17, Maven (`mobiarmy-java/pom.xml`); deps: postgresql (JDBC), sqlite-jdbc, Jackson
@@ -32,11 +36,13 @@ Inside `mobiarmy-java/src/main/java/com/mobiarmy/`:
 - DB: PostgreSQL (`ServerInit` → `SqlConnectionManager.usePostgres`), settings from `db-*` keys
   in `army2.conf` (`db-host` is `host:port`); password from env `DB_PASSWORD` (overrides
   `db-password`). Startup fails fast if the DB is unreachable. `useLocalDump` (throwaway SQLite
-  rebuilt from `dbarmy.sql`) still exists but is unused.
+  rebuilt from `dbarmy.sql`) still exists but is unused by the server; tests use it (`TestDb.fresh()`).
 - SQL must stay portable: no backtick quoting, unquoted identifiers (PostgreSQL lowercases them),
   flags as SMALLINT 0/1.
-- Only `exp`, the `online` flag and the selected character (`nhanvat`, 1-based) are written back to
-  the DB today; xu, luong, items and character purchases are not persisted yet.
+- Only `exp`, the `online` flag, the selected character (`nhanvat`, 1-based), passwords
+  (hashes, from the portal or re-hashing) and character purchases
+  (`nvBuy` + the session's current `xu`, written together) are written back to the DB today; other
+  xu changes, luong and items are not persisted yet.
 - Config: `mobiarmy-java/army2.conf` (port, room counts, limits, resource versions, DB settings)
 
 ## Commands
@@ -47,7 +53,7 @@ docker compose logs -f server    # wait for "Server started on port 19149"
 docker compose restart server    # apply army2.conf edits (mounted read-only, no rebuild)
 docker compose down              # stop, keeps data
 docker compose down -v           # RESET: deletes all game data
-docker compose exec db psql -U postgres -d dbarmy   # SQL shell (DB port is not published)
+docker compose exec db psql -U postgres -d dbarmy   # SQL shell; DB also on 127.0.0.1:${DB_PORT:-5432} for local tools
 ```
 Inside Docker the server gets `DB_HOST`/`DB_USER`/`DB_DATABASE`/`DB_PASSWORD` from the environment,
 which overrides `army2.conf`. Container scripts must stay LF (`.gitattributes`).

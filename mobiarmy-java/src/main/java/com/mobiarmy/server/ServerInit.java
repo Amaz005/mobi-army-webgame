@@ -40,6 +40,15 @@ public class ServerInit {
         } catch (Exception e) {
             throw new IllegalStateException("Cannot connect to PostgreSQL " + ServerManager.dbHost + "/" + ServerManager.dbDatabase, e);
         }
+        try {
+            int legacy = Accounts.countLegacy();
+            if (legacy > 0) {
+                System.out.println("WARNING: " + legacy + " accounts still have plaintext passwords; run HashPasswords"
+                        + " (specs/004-game-portal/quickstart.md §1).");
+            }
+        } catch (Exception e) {
+            System.err.println("Could not count plaintext passwords: " + e.getMessage());
+        }
 
         System.out.println("Load map data");
         try {

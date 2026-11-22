@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cổng game</title>
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/portal.css">
+</head>
+<body data-page="game">
+  <div class="layout">
+    <aside class="side">
+      <a class="brand" href="/"><img src="/icon-192.png" alt="" width="36" height="36"><span>Cổng game</span></a>
+      <nav class="menu" aria-label="Chính">
+        <a href="/"><span class="ico ico-play" aria-hidden="true"></span>Trò chơi</a>
+        <a href="/#huong-dan"><span class="ico ico-guide" aria-hidden="true"></span>Hướng dẫn</a>
+        <a href="/" data-ranking-link hidden><span class="ico ico-rank" aria-hidden="true"></span>Bảng xếp hạng</a>
+      </nav>
+      <div class="user" id="account" aria-label="Tài khoản"></div>
+    </aside>
+
+    <main>
+      <p class="crumb"><a href="/">← Tất cả trò chơi</a></p>
+      <p id="status" role="status"></p>
+
+      <article id="game" hidden>
+        <div class="game-head">
+          <img id="g-img" alt="" width="96" height="96">
+          <div>
+            <h1 id="g-name"></h1>
+            <p id="g-tagline" class="tagline"></p>
+            <p class="chips"><span id="g-players" class="chip"></span><span class="chip live" data-live=""></span></p>
+          </div>
+        </div>
+        <p><a id="g-play" class="btn" href="/">Chơi ngay</a></p>
+        <p id="g-maint" class="badge" hidden>Đang bảo trì</p>
+        <section id="cach-choi"></section>
+
+        <section id="bang-xep-hang" hidden>
+          <h2 class="section-title">Bảng xếp hạng</h2>
+          <p class="msg" role="status"></p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Hạng</th><th>Tên</th><th>Cấp</th><th>Kinh nghiệm</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </article>
+
+      <section id="g-missing" hidden>
+        <h1>Không tìm thấy trò chơi</h1>
+        <p><a href="/">Về trang chủ</a></p>
+      </section>
+
+      <section id="g-others" hidden>
+        <h2 class="section-title">Trò chơi khác</h2>
+        <ul class="cards"></ul>
+        <p class="hint empty" hidden>Sắp có thêm trò chơi.</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="/portal.js" defer></script>
+</body>
+</html>

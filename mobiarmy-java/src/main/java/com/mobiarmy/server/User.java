@@ -252,7 +252,77 @@ public class User {
         }
     }
 
-    static int levelFromExpValue(int exp) {
+    /** Number of starter characters every account owns; the client sends buy indexes relative to this (fa.b). */
+    static final int FREE_NV = 3;
+
+    /** Parses account.nvBuy ("[1, 1, 1, 0, ...]"); starter characters are always owned. */
+    static boolean[] parseNvBuy(String json, int len) {
+        boolean[] owned = new boolean[len];
+        if (json != null) {
+            String[] parts = json.replace("[", "").replace("]", "").split(",");
+            for (int i = 0; i < parts.length && i < len; i++) {
+                owned[i] = "1".equals(parts[i].trim());
+            }
+        }
+        for (int i = 0; i < len && i < FREE_NV; i++) owned[i] = true;
+        return owned;
+    }
+
+    static String formatNvBuy(boolean[] owned) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < owned.length; i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(owned[i] ? 1 : 0);
+        }
+        return sb.append(']').toString();
+    }
+
+    /** Returns the error to show the player, or null if the purchase is allowed. */
+    static String checkBuyNv(boolean[] owned, int index, int xu, int price) {
+        if (owned == null || index < FREE_NV || index >= owned.length) return "Nhân vật không hợp lệ.";
+        if (owned[index]) return "Bạn đã sở hữu nhân vật này.";
+        if (price < 0 || xu < price) return "Bạn không đủ xu.";
+        return null;
+    }
+
+    /**
+     * Command 74: buy a character. Client sends (byte index - FREE_NV); reply is 74 with
+     * (byte index - FREE_NV, int xu left). Price comes from the nhanvat table, never the client.
+     */
+    public synchronized void buyNvMessage(Message mss) {
+        try {
+            int index = mss.readByte() + FREE_NV;
+            int price = index >= 0 && index < NVData.entries.size() ? NVData.entries.get(index).buyXu : -1;
+            String err = checkBuyNv(nvBuy, index, xu, price);
+            if (err != null) {
+                sendMessage(new Message(4).sendUTF(err));
+                return;
+            }
+
+            boolean[] newOwned = nvBuy.clone();
+            newOwned[index] = true;
+            int newXu = xu - price;
+            try (Connection conn = SqlConnectionManager.createConnection();
+                 PreparedStatement stmt = conn.prepareStatement("UPDATE account SET xu=?, nvBuy=? WHERE id=?")) {
+                stmt.setInt(1, newXu);
+                stmt.setString(2, formatNvBuy(newOwned));
+                stmt.setInt(3, iddb);
+                stmt.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+                sendMessage(new Message(4).sendUTF("Lỗi máy chủ, vui lòng thử lại sau."));
+                return;
+            }
+
+            nvBuy = newOwned;
+            xu = newXu;
+            sendMessage(new Message(74).sendByte(index - FREE_NV).sendInt(xu));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int levelFromExpValue(int exp) {
         int level = 1;
         int remaining = exp;
         while (remaining - level * 100 >= 0) {
@@ -356,11 +426,13 @@ public class User {
         try {
             User us = null;
             try (Connection conn = SqlConnectionManager.createConnection();
-                 PreparedStatement stmt = conn.prepareStatement("SELECT * FROM account WHERE username=? AND password=? LIMIT 1")) {
+                 PreparedStatement stmt = conn.prepareStatement("SELECT * FROM account WHERE username=? ORDER BY id LIMIT 1")) {
                 stmt.setString(1, userName);
-                stmt.setString(2, pass);
                 try (java.sql.ResultSet row = stmt.executeQuery()) {
-                    if (row.next()) {
+                    String storedPass = null;
+                    if (row.next()) storedPass = row.getString("password");
+                    if (storedPass != null && Accounts.checkPassword(storedPass, pass)) {
+                        Accounts.rehashIfLegacy(row.getInt("id"), storedPass, pass);
                         us = new User(cl);
                         us.iddb = row.getInt("id");
                         us.username = row.getString("username");
@@ -397,8 +469,8 @@ public class User {
                         }
                         
                         int len = NVData.entries.size();
-                        us.nvBuy = new boolean[len];
-                        for (int i = 0; i < len && i < 3; i++) us.nvBuy[i] = true;
+                        us.nvBuy = parseNvBuy(row.getString("nvBuy"), len);
+                        if (!canSelectNv(us.nvBuy, us.nv)) us.nv = 0;
                         
                         us.lever = new int[len];
                         us.leverPercen = new byte[len];
@@ -430,7 +502,7 @@ public class User {
 
                         for (int i = 3; i < NVData.entries.size() && i < 9; i++) {
                             int priceThousand = NVData.entries.get(i).buyXu / 1000;
-                            ms.sendByte(0).sendShort((short) priceThousand);
+                            ms.sendByte(us.nvBuy[i] ? 1 : 0).sendShort((short) priceThousand);
                         }
 
                         ms.sendUTF("").sendUTF("");

@@ -1,5 +1,6 @@
 package com.mobiarmy.server;
 
+import com.mobiarmy.portal.PortalServer;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -11,6 +12,7 @@ public class GameServer {
     private static final int PORT = 19149; // Default port
     private static boolean running = false;
     private static ServerSocket serverSocket;
+    private static PortalServer portal;
     private static final ExecutorService threadPool = Executors.newCachedThreadPool();
     private static final AtomicInteger clientIdCounter = new AtomicInteger(1);
     
@@ -32,6 +34,7 @@ public class GameServer {
             ServerManager.numClients = 0;
             ServerManager.initRooms();
             ServerManager.start = true;
+            startPortal();
 
             int portToUse = ServerManager.port > 0 ? ServerManager.port : PORT;
             serverSocket = new ServerSocket(portToUse);
@@ -70,9 +73,24 @@ public class GameServer {
         }
     }
 
+    /** Web portal API (specs/004-game-portal). A failure here must not stop the game server. */
+    private static void startPortal() {
+        try {
+            portal = PortalServer.forGameServer(ServerManager.portalSessionIdleMinutes,
+                    ServerManager.portalSecureCookie, ServerManager::onlineCount);
+            portal.start(ServerManager.portalPort);
+            System.out.println("Portal API started on port " + ServerManager.portalPort);
+        } catch (Exception e) {
+            System.err.println("Portal API failed to start on port " + ServerManager.portalPort + ": " + e.getMessage());
+            e.printStackTrace();
+            portal = null;
+        }
+    }
+
     public static void stop() {
         if (!running) return;
         running = false;
+        if (portal != null) portal.stop();
         
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
