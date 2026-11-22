@@ -27,7 +27,7 @@ Inside `mobiarmy-java/src/main/java/com/mobiarmy/`:
 - `fight/` — fight engine: `FightManager`, `Bullet`/`BulletManager`, `Boss`/`SuperBoss`, maps
 - `data/` — static game data (`ItemData`, `MapData`, `NVData`, …) and `SqlConnectionManager`
 - `portal/` — web portal JSON API on the JDK HTTP server (`PortalServer`, internal port `portal-port` 8081,
-  nginx proxies `/api/`), `PortalSessions`, `LoginThrottle`, `Ranking`. Accounts: `server/Accounts`,
+  nginx proxies `/api/`), `PortalTokens` (JWT HS256 sessions, secret `PORTAL_JWT_SECRET`), `LoginThrottle`, `Ranking`. Accounts: `server/Accounts`,
   `Registration`, `PasswordHash` (PBKDF2; game login and portal share them), `HashPasswords` (migration tool)
 
 ## Tech Stack
@@ -68,6 +68,8 @@ docker run --rm -v "$PWD":/w -v mobiarmy-m2:/root/.m2 -w /w/web-client maven:3.9
 - In `@JSBody` scripts, `$`-prefix every local and inner-function parameter (TeaVM's minifier renames
   parameters but not locals, which caused real collisions).
 - `web.build.FixGameAction` patches the original client's self-recursive `el.getGameAction` at build time.
+- `web.build.AutoLoginPatch` patches the login screen `coreLG.dl.d()` at build time: with a portal ticket
+  (`web.AutoLogin`, fetched by the page shell) it answers the sound question, skips the intro and logs in.
 - `web.build.MakeIcons` generates `favicon.ico` and the home-screen icons from `Army165local/icon.png`
   at build time (integer nearest-neighbour scaling); generated icons are never committed. New
   web paths must be added to the nginx allowlist in both `docker/web/nginx.*.conf.template`.

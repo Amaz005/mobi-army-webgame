@@ -29,16 +29,20 @@ Migration: `mobiarmy-java/sql/migrations/004-portal-accounts.sql` + `HashPasswor
 - Anything not starting with `pbkdf2_sha256$` is a legacy plaintext value.
 - Verify: parse iterations + salt from the stored value, derive, compare in constant time.
 
-## Portal session (server memory only)
+## Portal session (signed JWT in the cookie; nothing stored on the server)
 
-| Field | Type | Notes |
-|-------|------|-------|
-| token | 32 random bytes, base64url | Cookie `portal_session`; never logged |
-| accountId | int | |
-| createdAt, lastUsedAt | instant | Expire after `portal-session-idle-minutes` idle (default 30) or 7 days total |
+`portal_session` cookie = JWT, HS256, signed with `PORTAL_JWT_SECRET` (env, ≥ 32 bytes; research D16).
 
-States: `active` → (`logout` \| idle timeout \| 7-day limit \| password change on another session
-\| server restart) → gone.
+| Claim | Meaning |
+|-------|---------|
+| `sub` | account id |
+| `name` | login name (display only) |
+| `pv` | HMAC of the stored password hash: a password change invalidates every other session |
+| `auth` | login time; sessions end 7 days after it |
+| `iat`, `exp` | issued / expires; `exp` = issue + `portal-session-idle-minutes`, renewed on use after 5 min |
+| `jti` | random id; logged-out tokens are refused (in memory) until they expire |
+
+The header must be exactly `{"alg":"HS256","typ":"JWT"}`. Sessions survive server restarts.
 
 ## Login throttle (server memory only)
 
@@ -83,3 +87,4 @@ Query: `SELECT username, exp FROM account WHERE superadmin = 0 ORDER BY exp DESC
 | `army2.conf` | `portal-session-idle-minutes` | `30` | Portal session idle timeout |
 | `army2.conf` | `portal-secure-cookie` | `false` | Add `Secure` to the cookie; compose sets it `true` in public mode via env `PORTAL_SECURE_COOKIE` |
 | `.env` | `WEB_API_RATE` | `30r/m` | nginx per-IP request rate for `/api/` |
+| `.env` | `PORTAL_JWT_SECRET` | (random per start) | Signs portal session JWTs; ≥ 32 characters; keep stable |

@@ -3,13 +3,15 @@
 Served by the game server (`portal-port`, internal), reached by browsers only through nginx at
 `/api/`. All bodies are UTF-8 JSON. Error bodies are `{"error": "<code>", "message": "<Vietnamese
 text>"}`. No response ever includes a password, hash, session token or any account column other
-than those listed (FR-010, SC-009).
+than those listed (FR-010, SC-009). The one exception is `/api/mobiarmy/ticket`: it returns a
+one-time game ticket, only to the logged-in owner, never cached (`no-store`).
 
 State-changing requests (`POST`) MUST send `Content-Type: application/json` and an `Origin`
 matching the host; otherwise `403 {"error":"forbidden"}`.
 
-Session cookie: `portal_session=<token>; HttpOnly; SameSite=Strict; Path=/api` (+ `Secure` in
-public mode).
+Session cookie: `portal_session=<JWT>; HttpOnly; SameSite=Strict; Path=/api` (+ `Secure` in
+public mode). Any authenticated response may carry a renewed cookie (sliding idle timeout); logins
+survive server restarts (data-model.md › Portal session, research D16).
 
 | Method | Path | Auth | Request | Success | Errors |
 |--------|------|------|---------|---------|--------|
@@ -20,6 +22,7 @@ public mode).
 | POST | `/api/password` | cookie | `{"currentPassword","newPassword"}` | `204`; other sessions of the account end | `401 not_logged_in`, `401 bad_credentials`, `400 invalid_password`, `429 too_many` |
 | GET | `/api/mobiarmy/status` | — | — | `200 {"online": 3, "takenAt": "2026-11-22T10:00:00Z"}` | — |
 | GET | `/api/mobiarmy/ranking` | — | — | `200 {"entries":[{"rank":1,"name":"a","level":12,"exp":8000}], "takenAt": "…"}` | — |
+| POST | `/api/mobiarmy/ticket` | cookie | `{}` | `200 {"username","ticket"}`: one-time game ticket (24 letters/digits, 2 min), accepted once as the password of that account's game login (research D15) | `401 not_logged_in` |
 
 Rules:
 - `username` is trimmed and lowercased by the server. Lookup tries the exact name first, then a

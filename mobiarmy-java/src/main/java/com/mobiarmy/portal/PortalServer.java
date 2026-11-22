@@ -3,6 +3,7 @@ package com.mobiarmy.portal;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mobiarmy.server.Accounts;
+import com.mobiarmy.server.GameTickets;
 import com.mobiarmy.server.PasswordHash;
 import com.mobiarmy.server.Registration;
 import com.sun.net.httpserver.HttpExchange;
@@ -32,7 +33,7 @@ public final class PortalServer {
     /** Verified when the login name doesn't exist, so a miss costs as much as a wrong password. */
     private static final String DUMMY_HASH = PasswordHash.hash("khongtontai0");
 
-    private final PortalSessions sessions;
+    private final PortalTokens tokens;
     private final LoginThrottle throttle;
     private final Ranking ranking;
     private final IntSupplier onlineCount;
@@ -41,9 +42,9 @@ public final class PortalServer {
     private HttpServer http;
     private ExecutorService executor;
 
-    public PortalServer(PortalSessions sessions, LoginThrottle throttle, Ranking ranking,
+    public PortalServer(PortalTokens tokens, LoginThrottle throttle, Ranking ranking,
                         IntSupplier onlineCount, Clock clock, boolean secureCookie) {
-        this.sessions = sessions;
+        this.tokens = tokens;
         this.throttle = throttle;
         this.ranking = ranking;
         this.onlineCount = onlineCount;
@@ -118,6 +119,7 @@ public final class PortalServer {
             case "/api/me" -> { requireGet(method); me(ex); }
             case "/api/mobiarmy/status" -> { requireGet(method); status(); }
             case "/api/mobiarmy/ranking" -> { requireGet(method); ranking(); }
+            case "/api/mobiarmy/ticket" -> { requirePost(ex); ticket(ex); }
             default -> throw error(404, "not_found", null);
         }
     }
@@ -181,11 +183,27 @@ public final class PortalServer {
 
     private String sessionCookie(String token) {
         return COOKIE + "=" + token + "; HttpOnly; SameSite=Strict; Path=/api; Max-Age="
-                + PortalSessions.MAX_AGE.toSeconds() + (secureCookie ? "; Secure" : "");
+                + PortalTokens.MAX_AGE.toSeconds() + (secureCookie ? "; Secure" : "");
     }
 
     private String clearedCookie() {
         return COOKIE + "=; HttpOnly; SameSite=Strict; Path=/api; Max-Age=0" + (secureCookie ? "; Secure" : "");
+    }
+
+    /** Attribute holding a renewed session cookie for this response (idle timeout slides on use). */
+    private static final String RENEWED = "portal.renewedCookie";
+
+    /** The verified session, or null; renews the cookie when the token is getting old. */
+    private PortalTokens.Session session(HttpExchange ex) throws Exception {
+        PortalTokens.Session s = tokens.verify(cookieToken(ex));
+        if (s != null && s.refresh) ex.setAttribute(RENEWED, sessionCookie(tokens.reissue(s, null)));
+        return s;
+    }
+
+    /** Token for a fresh login, bound to the password as stored now (after any re-hash). */
+    private String loginCookie(int accountId) throws Exception {
+        Accounts.Row acc = Accounts.findById(accountId);
+        return sessionCookie(tokens.issue(acc.id(), acc.username(), acc.password()));
     }
 
     private static Map<String, Object> user(String username) {
@@ -214,7 +232,7 @@ public final class PortalServer {
         throttle.recordRegistration(ip);
         Accounts.Row acc = Accounts.find(name);
         System.out.println("[Portal] registered account " + acc.id() + " " + acc.username());
-        throw new Reply(201, user(acc.username()), sessionCookie(sessions.create(acc.id(), acc.username())));
+        throw new Reply(201, user(acc.username()), loginCookie(acc.id()));
     }
 
     private void login(HttpExchange ex) throws Exception {
@@ -238,23 +256,22 @@ public final class PortalServer {
         }
         throttle.recordSuccess(name);
         Accounts.rehashIfLegacy(acc.id(), acc.password(), pass);
-        throw new Reply(200, user(acc.username()), sessionCookie(sessions.create(acc.id(), acc.username())));
+        throw new Reply(200, user(acc.username()), loginCookie(acc.id()));
     }
 
-    private void logout(HttpExchange ex) throws Reply {
-        sessions.remove(cookieToken(ex));
+    private void logout(HttpExchange ex) throws Exception {
+        tokens.revoke(tokens.verify(cookieToken(ex)));
         throw new Reply(204, null, clearedCookie());
     }
 
-    private void me(HttpExchange ex) throws Reply {
-        PortalSessions.Session s = sessions.get(cookieToken(ex));
+    private void me(HttpExchange ex) throws Exception {
+        PortalTokens.Session s = session(ex);
         if (s == null) throw error(401, "not_logged_in", null);
         throw new Reply(200, user(s.username), null);
     }
 
     private void password(HttpExchange ex) throws Exception {
-        String token = cookieToken(ex);
-        PortalSessions.Session s = sessions.get(token);
+        PortalTokens.Session s = session(ex);
         if (s == null) throw error(401, "not_logged_in", null);
         JsonNode b = body(ex);
         String current = text(b, "currentPassword");
@@ -270,10 +287,21 @@ public final class PortalServer {
             throw error(401, "bad_credentials", MSG_BAD_CREDENTIALS);
         }
         throttle.recordSuccess(key);
-        Accounts.updatePassword(acc.id(), PasswordHash.hash(next));
-        sessions.removeOthers(acc.id(), token);
+        String hash = PasswordHash.hash(next);
+        Accounts.updatePassword(acc.id(), hash);
+        // Tokens carry a fingerprint of the stored password: every other session is now invalid,
+        // this one gets a token for the new password.
         System.out.println("[Portal] password changed for account " + acc.id());
-        throw new Reply(204, null, null);
+        throw new Reply(204, null, sessionCookie(tokens.reissue(s, hash)));
+    }
+
+    /** One-time ticket the browser client logs in with, so the game doesn't ask again (research D15). */
+    private void ticket(HttpExchange ex) throws Exception {
+        PortalTokens.Session s = session(ex);
+        if (s == null) throw error(401, "not_logged_in", null);
+        Map<String, Object> m = user(s.username);
+        m.put("ticket", GameTickets.issue(s.accountId));
+        throw new Reply(200, m, null);
     }
 
     // --- live info (US4) ---
@@ -294,7 +322,8 @@ public final class PortalServer {
     }
 
     private static void send(HttpExchange ex, Reply r) throws IOException {
-        if (r.cookie != null) ex.getResponseHeaders().add("Set-Cookie", r.cookie);
+        String cookie = r.cookie != null ? r.cookie : (String) ex.getAttribute(RENEWED);
+        if (cookie != null) ex.getResponseHeaders().add("Set-Cookie", cookie);
         ex.getResponseHeaders().set("Cache-Control", "no-store");
         if (r.body == null) {
             ex.sendResponseHeaders(r.status, -1);
@@ -310,9 +339,11 @@ public final class PortalServer {
     }
 
     /** Wires the API to the running game server. */
-    public static PortalServer forGameServer(int idleMinutes, boolean secureCookie, IntSupplier onlineCount) {
+    public static PortalServer forGameServer(String jwtSecret, int idleMinutes, boolean secureCookie, IntSupplier onlineCount) {
         Clock clock = Clock.systemUTC();
-        return new PortalServer(new PortalSessions(java.time.Duration.ofMinutes(idleMinutes), clock),
+        PortalTokens tokens = new PortalTokens(PortalTokens.secretFrom(jwtSecret), java.time.Duration.ofMinutes(idleMinutes),
+                clock, id -> { Accounts.Row a = Accounts.findById(id); return a == null ? null : a.password(); });
+        return new PortalServer(tokens,
                 new LoginThrottle(clock), new Ranking(clock), onlineCount, clock, secureCookie);
     }
 }

@@ -55,6 +55,18 @@ public final class Accounts {
         return PasswordHash.verify(typed, stored);
     }
 
+    /**
+     * The game login check: the account's password (a legacy one is re-hashed), or a one-time ticket the
+     * portal issued for this account (research D15). A ticket never replaces the stored password.
+     */
+    public static boolean checkLogin(int id, String stored, String typed) {
+        if (checkPassword(stored, typed)) {
+            rehashIfLegacy(id, stored, typed);
+            return true;
+        }
+        return GameTickets.consume(id, typed);
+    }
+
     public static void updatePassword(int id, String hash) throws Exception {
         try (Connection conn = SqlConnectionManager.createConnection();
              PreparedStatement stmt = conn.prepareStatement("UPDATE account SET password = ? WHERE id = ?")) {

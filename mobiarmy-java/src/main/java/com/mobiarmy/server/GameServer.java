@@ -76,7 +76,7 @@ public class GameServer {
     /** Web portal API (specs/004-game-portal). A failure here must not stop the game server. */
     private static void startPortal() {
         try {
-            portal = PortalServer.forGameServer(ServerManager.portalSessionIdleMinutes,
+            portal = PortalServer.forGameServer(System.getenv("PORTAL_JWT_SECRET"), ServerManager.portalSessionIdleMinutes,
                     ServerManager.portalSecureCookie, ServerManager::onlineCount);
             portal.start(ServerManager.portalPort);
             System.out.println("Portal API started on port " + ServerManager.portalPort);

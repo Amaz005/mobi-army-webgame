@@ -25,14 +25,44 @@ class PortalServerTest {
     private String base;
     private String host;
 
+    private static final String SECRET = "portal-test-secret-portal-test-secret";
+
+    private PortalServer newServer() {
+        PortalTokens tokens = new PortalTokens(PortalTokens.secretFrom(SECRET), Duration.ofMinutes(30), clock,
+                id -> { Accounts.Row a = Accounts.findById(id); return a == null ? null : a.password(); });
+        return new PortalServer(tokens, new LoginThrottle(clock), new Ranking(clock), online::get, clock, false);
+    }
+
     @BeforeEach
     void start() throws Exception {
         TestDb.fresh();
-        server = new PortalServer(new PortalSessions(Duration.ofMinutes(30), clock), new LoginThrottle(clock),
-                new Ranking(clock), online::get, clock, false);
+        server = newServer();
         server.start(0);
         host = "localhost:" + server.port();
         base = "http://" + host;
+    }
+
+    @Test
+    void loginSurvivesAServerRestart() throws Exception {
+        String c = cookie(post("/api/login", "{\"username\":\"a\",\"password\":\"1\"}", null));
+        server.stop();
+        server = newServer();
+        server.start(0);
+        base = "http://localhost:" + server.port();
+        assertEquals("{\"username\":\"a\"}", get("/api/me", c).body());
+    }
+
+    @Test
+    void sessionCookieIsRenewedOnUseAndTimesOutWhenIdle() throws Exception {
+        String c = cookie(post("/api/login", "{\"username\":\"a\",\"password\":\"1\"}", null));
+        clock.advance(Duration.ofMinutes(6));
+        HttpResponse<String> r = get("/api/me", c);
+        assertEquals(200, r.statusCode());
+        String renewed = cookie(r);
+        assertNotEquals(c, renewed);
+        clock.advance(Duration.ofMinutes(28));
+        assertEquals(401, get("/api/me", c).statusCode(), "old cookie idle 34 min");
+        assertEquals(200, get("/api/me", renewed).statusCode());
     }
 
     @AfterEach
@@ -167,12 +197,31 @@ class PortalServerTest {
         assertTrue(bad.body().contains("bad_credentials"));
         assertEquals(400, post("/api/password", "{\"currentPassword\":\"abc123\",\"newPassword\":\"x\"}", c1).statusCode());
 
-        assertEquals(204, post("/api/password", "{\"currentPassword\":\"abc123\",\"newPassword\":\"xyz789\"}", c1).statusCode());
+        HttpResponse<String> changed = post("/api/password", "{\"currentPassword\":\"abc123\",\"newPassword\":\"xyz789\"}", c1);
+        assertEquals(204, changed.statusCode());
+        String c1new = cookie(changed);
         String stored = Accounts.find("testuser1").password();
         assertTrue(Accounts.checkPassword(stored, "xyz789"));
         assertFalse(Accounts.checkPassword(stored, "abc123"));
-        assertEquals(200, get("/api/me", c1).statusCode(), "current session kept");
+        assertEquals(200, get("/api/me", c1new).statusCode(), "current session kept, with a new cookie");
+        assertEquals(401, get("/api/me", c1).statusCode(), "its old cookie is tied to the old password");
         assertEquals(401, get("/api/me", c2).statusCode(), "other sessions ended");
+    }
+
+    // --- game ticket (research D15) ---
+
+    @Test
+    void ticketNeedsAPortalSessionAndLogsInOnce() throws Exception {
+        assertEquals(401, post("/api/mobiarmy/ticket", "{}", null).statusCode());
+        assertEquals(405, get("/api/mobiarmy/ticket", null).statusCode());
+        String c = cookie(post("/api/login", "{\"username\":\"nguoiduatin\",\"password\":\"3\"}", null));
+        HttpResponse<String> r = post("/api/mobiarmy/ticket", "{}", c);
+        assertEquals(200, r.statusCode());
+        assertTrue(r.body().startsWith("{\"username\":\"nguoiduatin\",\"ticket\":\""), r.body());
+        String ticket = r.body().replaceAll(".*\"ticket\":\"([A-Za-z0-9]+)\".*", "$1");
+        Accounts.Row acc = Accounts.find("nguoiduatin");
+        assertTrue(Accounts.checkLogin(acc.id(), acc.password(), ticket));
+        assertFalse(Accounts.checkLogin(acc.id(), acc.password(), ticket));
     }
 
     // --- live info (T041) ---

@@ -69,10 +69,12 @@ That's the **game portal** (spec 004): game cards, a page per game, and one acco
   `/mobiarmy/client/` the bare game client. Old links (`/index.html`, …) redirect to the play page.
 - **Đăng ký / Đăng nhập** in the top right: login name 3–20 lowercase letters or digits, password
   6–50 letters or digits. The same name and password log in to MobiArmy (browser and phone).
-  Existing MobiArmy accounts log in to the portal as they are. Forgotten passwords are reset by the
+  Existing MobiArmy accounts log in to the portal as they are. Logged in on the portal, "Chơi ngay"
+  goes straight to the MobiArmy main menu: no second login (a one-time ticket, see spec 004 research D15). Forgotten passwords are reset by the
   operator (no e-mail is collected).
 - Per-visitor limit on the portal API: `WEB_API_RATE` (default 30 requests/minute; login and
-  registration also lock after repeated failures). When players use HTTPS (public mode or the
+  registration also lock after repeated failures). Portal logins are signed tokens (JWT) and survive server
+  restarts as long as `PORTAL_JWT_SECRET` in `.env` stays the same (changing it logs everyone out). When players use HTTPS (public mode or the
   tunnel), set `PORTAL_SECURE_COOKIE=true` in `.env`.
 
 **Add a game to the portal:** put its files in `portal/games/<id>/` (served at `/games/<id>/…`), add an

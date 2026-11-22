@@ -37,12 +37,26 @@
         return;
       }
       window.mobiarmyStatus('Loading…');
-      var s = document.createElement('script');
-      s.src = 'client.js';
-      s.onload = function () { main([]); };
-      s.onerror = function () { window.mobiarmyStatus('Could not load the game. Check your connection and reload.'); };
-      document.body.appendChild(s);
-      document.getElementById('screen').focus();
+      var started = false;
+      function start() {
+        if (started) return;
+        started = true;
+        var s = document.createElement('script');
+        s.src = 'client.js';
+        s.onload = function () { main([]); };
+        s.onerror = function () { window.mobiarmyStatus('Could not load the game. Check your connection and reload.'); };
+        document.body.appendChild(s);
+        document.getElementById('screen').focus();
+      }
+      // Logged in on the game portal? Get a one-time ticket so the game logs in by itself
+      // (specs/004-game-portal research D15, web.AutoLogin). Never waits more than 3 s.
+      setTimeout(start, 3000);
+      fetch('/api/mobiarmy/ticket', { method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' }, body: '{}' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (t) { if (t && t.username && t.ticket && !started) window.mobiarmyAutoLogin = t; },
+              function () {})
+        .then(start);
     })();
   </script>
   <script src="keypad.js" defer></script>

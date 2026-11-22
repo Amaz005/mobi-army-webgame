@@ -167,6 +167,17 @@
                             <classpathScope>compile</classpathScope>
                         </configuration>
                     </execution>
+                    <!-- specs/004-game-portal: log in with a portal ticket (web.AutoLogin). -->
+                    <execution>
+                        <id>auto-login-patch</id>
+                        <phase>process-classes</phase>
+                        <goals><goal>java</goal></goals>
+                        <configuration>
+                            <mainClass>web.build.AutoLoginPatch</mainClass>
+                            <arguments><argument>${project.build.outputDirectory}</argument></arguments>
+                            <classpathScope>compile</classpathScope>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
